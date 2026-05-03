@@ -138,7 +138,7 @@
             <span class="text-xs font-bold text-gold tracking-widest" id="q-count">01 / 18</span>
         </div>
         <div class="space-y-10 centered-container">
-            <h2 id="question-text" class="text-l font-[900] text-ink leading-snug px-4">载入中...</h2>
+            <h2 id="question-text" class="text-2xl font-[900] text-ink leading-snug px-4">载入中...</h2>
             <div id="options" class="space-y-4 w-full"></div>
         </div>
     </div>
@@ -227,27 +227,92 @@
         <button onclick="closePoster()" class="mt-4 text-white/40 text-sm underline">关闭预览</button>
     </div>
 
-    <!-- ══════════════ 海报离屏容器（按需插入） ══════════════ -->
-    <div id="poster-container" style="width:375px;position:absolute;left:-9999px;background:white;display:none;">
-        <div class="p-8 bg-white relative centered-container">
-            <div id="p-rarity" class="text-[10px] font-bold text-gold tracking-widest mb-6"></div>
-            <div class="flex flex-col items-center gap-2 mb-4">
-                <img id="p-img-display" src="" alt="" class="w-40 h-40 object-contain mb-2">
-                <h1 id="p-name" class="text-5xl font-[900] text-ink tracking-tighter leading-tight"></h1>
-                <p id="p-tag" class="text-[10px] font-bold text-vermilion tracking-[0.3em] uppercase"></p>
-            </div>
-            <div class="chart-wrap mb-6"><canvas id="radarChartPoster"></canvas></div>
-            <div class="bg-parchment p-5 rounded-2xl italic text-gray-500 text-[11px] leading-relaxed text-center mb-6 border-l-2 border-vermilion w-full" id="p-desc"></div>
-            <div class="grid grid-cols-2 gap-3 mb-8 w-full">
-                <div class="bg-gray-50 py-3 rounded-xl text-center"><span class="text-gray-400 text-[8px] block">灵魂伴侣</span><span id="p-mate" class="font-bold text-ink text-xs"></span></div>
-                <div class="bg-gray-50 py-3 rounded-xl text-center"><span class="text-gray-400 text-[8px] block">一生之敌</span><span id="p-enemy" class="font-bold text-ink text-xs"></span></div>
-            </div>
-            <div class="flex justify-between items-end border-t border-gray-50 pt-6 w-full">
-                <div class="space-y-1 text-left">
-                    <p class="text-ink font-bold text-[10px]">扫码寻找你的江湖原型</p>
-                    <p class="text-gray-300 text-[8px] uppercase tracking-widest">Ancient Souls In Modern Lives</p>
+    <!-- ══════════════ 海报离屏容器 ══════════════ -->
+    <div id="poster-container" style="width:375px;position:absolute;left:-9999px;background:#fbfaf8;display:none;font-family:'STSong','SimSun','Songti SC',Georgia,serif;">
+        <div style="padding:28px 24px 20px;background:#fbfaf8;">
+
+            <!-- 头部：稀有度 + 角色 -->
+            <div style="text-align:center;margin-bottom:16px">
+                <div id="p-rarity" style="display:inline-block;font-size:9px;font-weight:700;color:#c19a6b;letter-spacing:0.15em;border:1px solid rgba(193,154,107,0.3);border-radius:99px;padding:3px 12px;margin-bottom:12px"></div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:14px">
+                    <img id="p-img-display" src="" alt="" style="width:80px;height:80px;object-fit:contain;flex-shrink:0">
+                    <div style="text-align:left">
+                        <h1 id="p-name" style="font-size:36px;font-weight:900;color:#1a1a1a;line-height:1.1;letter-spacing:-0.02em;margin:0 0 4px"></h1>
+                        <p id="p-tag" style="font-size:10px;font-weight:700;color:#962f23;letter-spacing:0.15em;margin:0"></p>
+                    </div>
                 </div>
-                <div id="qrcode" class="p-1 border border-gray-100 bg-white"></div>
+            </div>
+
+            <!-- 雷达图 -->
+            <div style="height:200px;position:relative;margin-bottom:14px">
+                <canvas id="radarChartPoster"></canvas>
+            </div>
+
+            <!-- 武学心法 -->
+            <div style="background:#fff8f5;border-left:3px solid #962f23;padding:10px 14px;border-radius:8px;margin-bottom:12px">
+                <div style="font-size:8px;font-weight:700;color:#962f23;letter-spacing:0.2em;margin-bottom:4px">◎ 武学心法</div>
+                <div id="p-mantra" style="font-size:12px;font-weight:700;color:#1a1a1a;font-style:italic;line-height:1.5"></div>
+            </div>
+
+            <!-- 角色解析 -->
+            <div style="background:white;border:1px solid #f0ede8;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+                <div style="font-size:8px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;margin-bottom:6px">◎ 江湖原型解析</div>
+                <div id="p-profile" style="font-size:11px;color:#374151;line-height:1.7"></div>
+            </div>
+
+            <!-- 六维迷你条形 -->
+            <div style="background:white;border:1px solid #f0ede8;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+                <div style="font-size:8px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;margin-bottom:8px">◎ 六维能量</div>
+                <div id="p-traits" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px"></div>
+            </div>
+
+            <!-- 优势 + 软肋 两列 -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+                <div style="background:white;border:1px solid #f0ede8;border-radius:10px;padding:10px 12px">
+                    <div style="font-size:8px;font-weight:700;color:#2a6b3f;letter-spacing:0.15em;margin-bottom:6px">◎ 江湖优势</div>
+                    <div id="p-strengths" style="font-size:10px;color:#374151;line-height:1.7"></div>
+                </div>
+                <div style="background:white;border:1px solid #f0ede8;border-radius:10px;padding:10px 12px">
+                    <div style="font-size:8px;font-weight:700;color:#962f23;letter-spacing:0.15em;margin-bottom:6px">◎ 致命软肋</div>
+                    <div id="p-weaknesses" style="font-size:10px;color:#374151;line-height:1.7"></div>
+                </div>
+            </div>
+
+            <!-- 行为画像 -->
+            <div style="background:white;border:1px solid #f0ede8;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+                <div style="font-size:8px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;margin-bottom:8px">◎ 当代侠客行为画像</div>
+                <div id="p-modern" style="font-size:10px;color:#374151;line-height:1.7"></div>
+            </div>
+
+            <!-- 建议 -->
+            <div style="background:white;border:1px solid #f0ede8;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+                <div style="font-size:8px;font-weight:700;color:#c19a6b;letter-spacing:0.2em;margin-bottom:6px">◎ 给当代侠客的建议</div>
+                <div id="p-advice" style="font-size:11px;color:#374151;line-height:1.7"></div>
+            </div>
+
+            <!-- 三联关系 -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px">
+                <div style="background:white;border:1px solid #f0ede8;border-radius:8px;padding:8px;text-align:center">
+                    <div style="font-size:7px;color:#9ca3af;margin-bottom:3px">灵魂伴侣</div>
+                    <div id="p-mate" style="font-size:11px;font-weight:700;color:#1a1a1a"></div>
+                </div>
+                <div style="background:white;border:1px solid #f0ede8;border-radius:8px;padding:8px;text-align:center">
+                    <div style="font-size:7px;color:#9ca3af;margin-bottom:3px">一生之敌</div>
+                    <div id="p-enemy" style="font-size:11px;font-weight:700;color:#1a1a1a"></div>
+                </div>
+                <div style="background:white;border:1px solid #f0ede8;border-radius:8px;padding:8px;text-align:center">
+                    <div style="font-size:7px;color:#9ca3af;margin-bottom:3px">同道中人</div>
+                    <div id="p-peer" style="font-size:11px;font-weight:700;color:#1a1a1a"></div>
+                </div>
+            </div>
+
+            <!-- 底部 QR -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid #f0ede8;padding-top:14px">
+                <div>
+                    <p style="font-size:9px;font-weight:700;color:#1a1a1a;margin:0 0 2px">扫码寻找你的江湖原型</p>
+                    <p style="font-size:7px;color:#d1d5db;letter-spacing:0.2em;margin:0;text-transform:uppercase">Ancient Souls In Modern Lives</p>
+                </div>
+                <div id="qrcode" style="padding:4px;border:1px solid #f0ede8;background:white;border-radius:4px"></div>
             </div>
         </div>
     </div>
@@ -802,7 +867,6 @@
     function generatePoster() {
         const overlay = document.getElementById('poster-overlay');
         overlay.style.display = 'flex';
-        // iOS Safari 滚动锁定
         document.body.style.overflow = 'hidden';
 
         const container = document.getElementById('poster-img-container');
@@ -810,35 +874,95 @@
 
         const bestMatch = currentBestMatch;
         const normalized = normalizeScore(userScore);
-        const topTraitKey = Object.keys(normalized).reduce((a, b) => normalized[a] > normalized[b] ? a : b);
-        const topTrait = traitInfo[topTraitKey];
-        const vals = [normalized.X, normalized.M, normalized.Z, normalized.Q, normalized.K, normalized.Y].map(v => Math.round(v));
+        const traitKeys = ['X','M','Z','Q','K','Y'];
+        const sorted = [...traitKeys].sort((a,b) => normalized[b] - normalized[a]);
+        const topKey = sorted[0];
+        const topTrait = traitInfo[topKey];
+        const topTwo = sorted.slice(0,2);
+        const vals = traitKeys.map(k => Math.round(normalized[k]));
 
-        // 填充海报元素
+        // ── 基础字段 ──
         document.getElementById('p-rarity').innerText = bestMatch.rarity;
         document.getElementById('p-name').innerText = bestMatch.name;
         document.getElementById('p-tag').innerText = bestMatch.tag;
-        document.getElementById('p-mate').innerText = bestMatch.mate;
-        document.getElementById('p-enemy').innerText = bestMatch.enemy;
         document.getElementById('p-img-display').src = bestMatch.img;
         document.getElementById('p-img-display').alt = bestMatch.name;
-        document.getElementById('p-desc').innerText = `【${topTrait.mantra}】 ${topTrait.detail}`;
+        document.getElementById('p-mate').innerText = bestMatch.mate;
+        document.getElementById('p-enemy').innerText = bestMatch.enemy;
+        document.getElementById('p-peer').innerText = bestMatch.peer || '—';
+
+        // ── 武学心法 ──
+        document.getElementById('p-mantra').innerText = topTrait.mantra;
+
+        // ── 角色解析 ──
+        document.getElementById('p-profile').innerText = bestMatch.profile || topTrait.detail;
+
+        // ── 六维迷你条形 ──
+        const pTraits = document.getElementById('p-traits');
+        pTraits.innerHTML = '';
+        traitKeys.forEach(key => {
+            const t = traitInfo[key];
+            const pct = Math.round((normalized[key] / 60) * 100);
+            let color = pct >= 70 ? '#962f23' : pct >= 35 ? '#c19a6b' : '#d1d5db';
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px">
+                    <span style="font-weight:700;color:${color}">${t.name}</span>
+                    <span style="color:#9ca3af">${pct}%</span>
+                </div>
+                <div style="height:3px;background:#f3f4f6;border-radius:99px;overflow:hidden">
+                    <div style="height:100%;width:${pct}%;background:${color};border-radius:99px"></div>
+                </div>`;
+            pTraits.appendChild(div);
+        });
+
+        // ── 优势 ──
+        const pStr = document.getElementById('p-strengths');
+        pStr.innerHTML = '';
+        let strItems = [];
+        topTwo.forEach(key => strItems.push(...traitInfo[key].strengths));
+        strItems.slice(0,4).forEach(s => {
+            const d = document.createElement('div');
+            d.style.cssText = 'margin-bottom:4px';
+            d.innerHTML = `<span style="color:#2a6b3f">▸ </span>${s}`;
+            pStr.appendChild(d);
+        });
+
+        // ── 软肋 ──
+        const pWeak = document.getElementById('p-weaknesses');
+        pWeak.innerHTML = '';
+        topTrait.weaknesses.forEach(w => {
+            const d = document.createElement('div');
+            d.style.cssText = 'margin-bottom:4px';
+            d.innerHTML = `<span style="color:#962f23">▸ </span>${w}`;
+            pWeak.appendChild(d);
+        });
+
+        // ── 行为画像 ──
+        const pModern = document.getElementById('p-modern');
+        pModern.innerHTML = '';
+        topTrait.modern.forEach(m => {
+            const d = document.createElement('div');
+            d.style.cssText = 'display:flex;gap:6px;margin-bottom:5px;align-items:flex-start';
+            d.innerHTML = `<span style="flex-shrink:0">${m.icon}</span><span><b style="color:#6b7280">${m.label}：</b>${m.text}</span>`;
+            pModern.appendChild(d);
+        });
+
+        // ── 建议 ──
+        document.getElementById('p-advice').innerText = topTrait.advice;
 
         // 显示离屏容器
         const posterContainer = document.getElementById('poster-container');
         posterContainer.style.display = 'block';
 
-        // 延迟等待图片加载，再初始化海报雷达图，再截图
         setTimeout(() => {
             if (radarChartPoster) { radarChartPoster.destroy(); radarChartPoster = null; }
             radarChartPoster = initRadar('radarChartPoster', vals);
 
-            // 生成 QR 码
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
             new QRCode(qrContainer, { text: window.location.href, width: 48, height: 48 });
 
-            // 动态 scale，避免低端机 OOM
             const scale = Math.min(window.devicePixelRatio || 2, 2);
 
             setTimeout(() => {
@@ -849,7 +973,6 @@
                     img.src = canvas.toDataURL('image/png');
                     container.innerHTML = '';
                     container.appendChild(img);
-                    // 截图完成后隐藏离屏容器
                     posterContainer.style.display = 'none';
                     if (radarChartPoster) { radarChartPoster.destroy(); radarChartPoster = null; }
                 }).catch(() => {
