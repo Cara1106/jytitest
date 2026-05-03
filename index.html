@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -19,27 +18,88 @@
         }
     </script>
     <style>
-        body { font-family: 'Noto Serif SC', serif; background-color: #fbfaf8; color: #1a1a1a; line-height: 1.5; overflow-x: hidden; }
-        .option-btn { transition: all 0.2s; }
-        #poster-overlay { display: none; background: rgba(0,0,0,0.95); z-index: 1000; position: fixed; inset: 0; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        #poster-img-container img { max-width: 92vw; max-height: 85vh; border-radius: 12px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
-        #poster-container { width: 375px; position: absolute; left: -9999px; background: white; }
-        .chart-wrap { position: relative; height: 220px; width: 100%; margin: 0 auto; }
-        /* 布局居中强化 */
+        /* ── 字体：系统字体栈，彻底绕开 Google Fonts ── */
+        body {
+            font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "Songti SC", Georgia, serif;
+            background-color: #fbfaf8;
+            color: #1a1a1a;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* ── 进度条 ── */
+        #progress-bar-wrap {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: rgba(193,154,107,0.15);
+            z-index: 100;
+            display: none;
+        }
+        #progress-bar {
+            height: 100%;
+            background: #962f23;
+            transition: width 0.35s ease;
+            width: 0%;
+        }
+
+        /* ── 选项按钮 ── */
+        .option-btn {
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
+        }
+        .option-btn.selected {
+            background: #fdf3f1 !important;
+            border-color: #962f23 !important;
+        }
+        .option-btn:active { transform: scale(0.97); }
+
+        /* ── 海报 overlay ── */
+        #poster-overlay {
+            display: none;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            position: fixed;
+            inset: 0;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            /* iOS Safari 滚动锁定由 JS 控制 body overflow */
+        }
+        #poster-img-container img {
+            max-width: 92vw;
+            max-height: 85vh;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        }
+
+        /* ── 海报离屏容器 ── */
+        #poster-container {
+            width: 375px;
+            position: absolute;
+            left: -9999px;
+            background: white;
+        }
+
+        .chart-wrap { position: relative; height: 240px; width: 100%; margin: 0 auto; }
         .centered-container { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
-        #quiz-page { min-height: 100vh; display: none; flex-direction: column; justify-content: center; }
+        #quiz-page { min-height: 100vh; flex-direction: column; justify-content: center; }
         .role-image { width: 180px; height: 180px; object-fit: contain; margin-bottom: 1rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen pb-12">
 
- <div id="start-page" class="max-w-2xl w-full text-center space-y-8 py-16 px-6 flex flex-col justify-center min-h-screen">
+    <!-- 顶部进度条 -->
+    <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+
+    <!-- ══════════════ 开始页 ══════════════ -->
+    <div id="start-page" class="max-w-2xl w-full text-center space-y-8 py-16 px-6 flex flex-col justify-center min-h-screen" style="display:flex;">
         <div class="space-y-6 flex flex-col items-center">
             <h1 class="text-7xl md:text-9xl font-[900] text-ink tracking-[0.2em] leading-none mb-2">JYTI</h1>
             <div class="h-px w-24 bg-gold opacity-30"></div>
             <p class="text-lg md:text-xl font-bold text-gold tracking-[0.25em] whitespace-nowrap opacity-80 uppercase italic">SBTI已经过时，江湖才是唯一的底色</p>
         </div>
-        
+
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-lg mx-auto w-full">
             <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                 <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">测试题数</p>
@@ -71,7 +131,8 @@
         </div>
     </div>
 
-    <div id="quiz-page" class="max-w-md w-full space-y-8 px-6">
+    <!-- ══════════════ 答题页 ══════════════ -->
+    <div id="quiz-page" class="max-w-md w-full space-y-8 px-6" style="display:none;">
         <div class="flex justify-between items-center px-1 mb-4">
             <button onclick="prev()" id="prev-btn" class="text-gray-400 text-xs font-bold invisible">← 上一题</button>
             <span class="text-xs font-bold text-gold tracking-widest" id="q-count">01 / 18</span>
@@ -82,10 +143,11 @@
         </div>
     </div>
 
-    <div id="result-page" class="hidden max-w-md w-full space-y-6 px-4 pb-12 pt-8">
+    <!-- ══════════════ 结果页 ══════════════ -->
+    <div id="result-page" class="max-w-md w-full space-y-6 px-4 pb-12 pt-8" style="display:none;">
         <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-50 relative centered-container">
             <div id="role-rarity" class="text-center text-[11px] font-bold text-gold tracking-[0.2em] mb-6 px-4 py-1 border border-gold/20 rounded-full"></div>
-            
+
             <div class="text-center mb-4 flex flex-col items-center">
                 <img id="role-img-display" src="" alt="" class="role-image">
                 <h2 id="role-name" class="text-5xl font-[900] text-ink tracking-tighter"></h2>
@@ -125,17 +187,19 @@
 
         <div class="grid grid-cols-2 gap-4 px-2">
             <button onclick="generatePoster()" class="py-4 bg-vermilion text-white rounded-2xl font-bold shadow-lg active:scale-95 transition">生成海报</button>
-            <button onclick="location.reload()" class="py-4 bg-white text-ink border border-gray-200 rounded-2xl font-bold active:scale-95 transition">重新测试</button>
+            <button onclick="resetQuiz()" class="py-4 bg-white text-ink border border-gray-200 rounded-2xl font-bold active:scale-95 transition">重新测试</button>
         </div>
     </div>
 
+    <!-- ══════════════ 海报 overlay ══════════════ -->
     <div id="poster-overlay">
         <div id="poster-img-container" class="relative"></div>
         <p class="text-white/60 text-[10px] mt-6 tracking-[0.4em]">长按图片保存 闯荡江湖</p>
         <button onclick="closePoster()" class="mt-4 text-white/40 text-sm underline">关闭预览</button>
     </div>
 
-    <div id="poster-container">
+    <!-- ══════════════ 海报离屏容器（按需插入） ══════════════ -->
+    <div id="poster-container" style="width:375px;position:absolute;left:-9999px;background:white;display:none;">
         <div class="p-8 bg-white relative centered-container">
             <div id="p-rarity" class="text-[10px] font-bold text-gold tracking-widest mb-6"></div>
             <div class="flex flex-col items-center gap-2 mb-4">
@@ -160,352 +224,471 @@
     </div>
 
     <script>
-        const traitInfo = {
-            X: { name: "侠", explain: "侠义/利他", mantra: "为国为民，侠之大者。", detail: "高分者不畏强权，看重社会公义。你内心藏着守护者的灵魂。", advice: "坚持你的原则，但也要学会在规则内保护自己。" },
-            M: { name: "谋", explain: "策略/洞察", mantra: "运筹帷幄，决胜千里。", detail: "高分者洞察人性，布局深远。理性和逻辑是你最锋利的武器。", advice: "聪明是天赋，但别让算计盖过了真诚。" },
-            Z: { name: "执", explain: "定力/持久", mantra: "纵有万难，绝不回头。", detail: "高分者百折不挠。一旦认定目标，纵有万千阻碍亦不回头。", advice: "坚毅是好事，但偶尔也要抬头看看是否走错了方向。" },
-            Q: { name: "情", explain: "感性/痴念", mantra: "情不知所起，一往而深。", detail: "高分者用情极深。你拒绝冷漠，感性是你的引路灯。", advice: "爱人先爱己，别在感性的潮汐中迷失了自我。" },
-            K: { name: "狂", explain: "反叛/个性", mantra: "不入俗套，我自狂歌。", detail: "高分者不屑规则。你敢于向一切平庸挑战，卓尔不群。", advice: "你的独特很迷人，但适度的合群能让你走得更远。" },
-            Y: { name: "隐", explain: "出世/宁静", mantra: "采菊东篱，心远地偏。", detail: "高分者追求内心平静。渴望归隐，是喧嚣世界的观望者。", advice: "隐于市而非逃避，在尘世中找到属于你的安静角落。" }
-        };
+    // ══════════════════════════════════════════════
+    //  数据层
+    // ══════════════════════════════════════════════
+    const TOTAL_Q = 18;
+    const MAX_ROLE_SCORE = 60; // 角色预设上限
 
-       // 60个角色库
-        const roles = [
-            // 男侠 - 正派
-            { g: "M", name: "郭靖", img: "guojing.png", mate: "黄蓉", enemy: "欧阳锋", rarity: "江湖稀有度：1%（万中无一的纯粹大侠）", tag: "#侠之大者", scores: {X:55, M:15, Z:55, Q:30, K:10, Y:15} },
-            { g: "M", name: "乔峰", img: "qiaofeng.png", mate: "阿朱", enemy: "慕容复", rarity: "江湖稀有度：2%（悲剧英雄般的战神）", tag: "#义薄云天", scores: {X:55, M:25, Z:45, Q:35, K:25, Y:10} },
-            { g: "M", name: "令狐冲", img: "linghuchong.png", mate: "任盈盈", enemy: "岳不群", rarity: "江湖稀有度：5%（世间少有的自由灵魂）", tag: "#洒脱不羁", scores: {X:35, M:25, Z:15, Q:35, K:45, Y:45} },
-            { g: "M", name: "张无忌", img: "zhangwuji.png", mate: "赵敏", enemy: "成昆", rarity: "江湖稀有度：8%（宽厚温良的绝世高手）", tag: "#厚德载物", scores: {X:40, M:20, Z:25, Q:50, K:15, Y:30} },
-            { g: "M", name: "段誉", img: "duanyu.png", mate: "王语嫣", enemy: "鸠摩智", rarity: "江湖稀有度：6%（至情至性的痴情公子）", tag: "#至情至性", scores: {X:30, M:15, Z:20, Q:55, K:20, Y:40} },
-            { g: "M", name: "胡斐", img: "hufei.png", mate: "程灵素", enemy: "田归农", rarity: "江湖稀有度：10%（爱憎分明的热血刀客）", tag: "#爱憎分明", scores: {X:45, M:20, Z:35, Q:30, K:30, Y:15} },
-            { g: "M", name: "石破天", img: "shipotian.png", mate: "阿绣", enemy: "贝海石", rarity: "江湖稀有度：4%（返璞归真的赤子）", tag: "#大巧若拙", scores: {X:40, M:10, Z:45, Q:25, K:10, Y:50} },
-            { g: "M", name: "袁承志", img: "yuanchengzhi.png", mate: "温青青", enemy: "皇太极", rarity: "江湖稀有度：12%（端方持重的领袖才干）", tag: "#端方持重", scores: {X:45, M:30, Z:40, Q:30, K:15, Y:20} },
-            { g: "M", name: "陈家洛", img: "chenjialuo.png", mate: "香香公主", enemy: "乾隆", rarity: "江湖稀有度：15%（书生意气的理想主义者）", tag: "#书生意气", scores: {X:35, M:40, Z:30, Q:45, K:15, Y:15} },
-            { g: "M", name: "狄云", img: "diyun.png", mate: "水笙", enemy: "花铁干", rarity: "江湖稀有度：3%（在黑暗中涅槃的坚韧者）", tag: "#涅槃重生", scores: {X:35, M:15, Z:55, Q:40, K:10, Y:45} },
-            // 男侠 - 反派
-            { g: "M", name: "欧阳锋", img: "ouyangfeng.png", mate: "武学巅峰", enemy: "洪七公", rarity: "江湖稀有度：2%（偏执到极致的武痴）", tag: "#逆流而上", scores: {X:10, M:45, Z:55, Q:15, K:50, Y:10} },
-            { g: "M", name: "岳不群", img: "yuebuqun.png", mate: "辟邪剑谱", enemy: "令狐冲", rarity: "江湖稀有度：3%（极致隐忍的布局者）", tag: "#隐忍布局", scores: {X:15, M:55, Z:50, Q:10, K:20, Y:10} },
-            { g: "M", name: "金轮法王", img: "jinlunfawang.png", mate: "好徒儿", enemy: "杨过", rarity: "江湖稀有度：5%（自负巅峰的宗师）", tag: "#自负巅峰", scores: {X:20, M:35, Z:50, Q:20, K:25, Y:15} },
-            { g: "M", name: "慕容复", img: "murongfu.png", mate: "大燕皇位", enemy: "段誉", rarity: "江湖稀有度：4%（背负宿命的囚徒）", tag: "#执念成狂", scores: {X:15, M:45, Z:55, Q:15, K:25, Y:5} },
-            { g: "M", name: "林平之", img: "linpingzhi.png", mate: "岳灵珊", enemy: "余沧海", rarity: "江湖稀有度：6%（被仇恨淬炼的孤狼）", tag: "#向死而生", scores: {X:15, M:35, Z:55, Q:20, K:45, Y:5} },
-            { g: "M", name: "成昆", img: "chengkun.png", mate: "灭明教", enemy: "谢逊", rarity: "江湖稀有度：1%（算无遗策的暗影）", tag: "#算无遗策", scores: {X:5, M:58, Z:50, Q:25, K:30, Y:10} },
-            { g: "M", name: "游坦之", img: "youtanzhi.png", mate: "阿紫", enemy: "乔峰", rarity: "江湖稀有度：2%（卑微到尘埃的痴恋者）", tag: "#爱到尘埃", scores: {X:10, M:15, Z:55, Q:58, K:20, Y:5} },
-            { g: "M", name: "左冷禅", img: "zuolengchan.png", mate: "五岳盟主", enemy: "任我行", rarity: "江湖稀有度：5%（权谋至上的铁腕枭雄）", tag: "#权谋至上", scores: {X:10, M:50, Z:45, Q:10, K:35, Y:10} },
-            { g: "M", name: "丁春秋", img: "dingchunqiu.png", mate: "逍遥派", enemy: "虚竹", rarity: "江湖稀有度：7%（唯我独尊的狂徒）", tag: "#唯我独尊", scores: {X:5, M:40, Z:30, Q:15, K:55, Y:10} },
-            { g: "M", name: "田归农", img: "tianguinong.png", mate: "宝藏", enemy: "苗人凤", rarity: "江湖稀有度：10%（见缝插针的精致利己者）", tag: "#见缝插针", scores: {X:10, M:50, Z:35, Q:20, K:25, Y:15} },
-            // 男侠 - 奇人
-            { g: "M", name: "周伯通", img: "zhoubotong.png", mate: "瑛姑", enemy: "无聊", rarity: "江湖稀有度：1%（天真烂漫的顽童）", tag: "#天真烂漫", scores: {X:30, M:10, Z:20, Q:25, K:55, Y:50} },
-            { g: "M", name: "韦小宝", img: "weixiaobao.png", mate: "双儿", enemy: "苦差事", rarity: "江湖稀有度：2%（左右逢源的混世锦鲤）", tag: "#左右逢源", scores: {X:25, M:58, Z:15, Q:40, K:50, Y:20} },
-            { g: "M", name: "田伯光", img: "tianbiguang.png", mate: "令狐冲", enemy: "规矩", rarity: "江湖稀有度：8%（不落俗套的快活浪子）", tag: "#不落俗套", scores: {X:30, M:25, Z:20, Q:35, K:55, Y:25} },
-            { g: "M", name: "谢逊", img: "xiexun.png", mate: "张翠山", enemy: "成昆", rarity: "江湖稀有度：4%（狂暴而深邃的智者）", tag: "#金毛狮王", scores: {X:35, M:40, Z:45, Q:45, K:50, Y:15} },
-            { g: "M", name: "南海鳄神", img: "nanhaieshen.png", mate: "师父段誉", enemy: "规矩", rarity: "江湖稀有度：6%（言出必行的憨侠）", tag: "#言出必行", scores: {X:35, M:5, Z:40, Q:20, K:45, Y:15} },
-            { g: "M", name: "桃根仙", img: "taogenxian.png", mate: "五仙兄弟", enemy: "逻辑", rarity: "江湖稀有度：5%（思维跳脱的鬼才）", tag: "#胡搅蛮缠", scores: {X:25, M:35, Z:15, Q:20, K:55, Y:10} },
-            { g: "M", name: "祖千秋", img: "zuqianqiu.png", mate: "老不死", enemy: "没酒", rarity: "江湖稀有度：12%（雅癖古怪的奇人）", tag: "#饮酒专家", scores: {X:20, M:45, Z:30, Q:25, K:40, Y:25} },
-            { g: "M", name: "柯镇恶", img: "kezhenee.png", mate: "兄弟姐妹", enemy: "全天下恶人", rarity: "江湖稀有度：3%（一生不服的硬颈杠精）", tag: "#一生不服", scores: {X:55, M:5, Z:58, Q:25, K:45, Y:5} },
-            { g: "M", name: "虚竹", img: "xuzhu.png", mate: "梦姑", enemy: "破戒", rarity: "江湖稀有度：7%（随缘随性的佛系锦鲤）", tag: "#随缘随性", scores: {X:35, M:10, Z:40, Q:30, K:10, Y:55} },
-            { g: "M", name: "茅十八", img: "maoshiba.png", mate: "韦小宝", enemy: "官府", rarity: "江湖稀有度：15%（豪气干云的草莽英雄）", tag: "#豪气干云", scores: {X:50, M:10, Z:35, Q:25, K:35, Y:10} },
+    const traitInfo = {
+        X: { name: "侠", explain: "侠义/利他", mantra: "为国为民，侠之大者。", detail: "高分者不畏强权，看重社会公义。你内心藏着守护者的灵魂。", advice: "坚持你的原则，但也要学会在规则内保护自己。" },
+        M: { name: "谋", explain: "策略/洞察", mantra: "运筹帷幄，决胜千里。", detail: "高分者洞察人性，布局深远。理性和逻辑是你最锋利的武器。", advice: "聪明是天赋，但别让算计盖过了真诚。" },
+        Z: { name: "执", explain: "定力/持久", mantra: "纵有万难，绝不回头。", detail: "高分者百折不挠。一旦认定目标，纵有万千阻碍亦不回头。", advice: "坚毅是好事，但偶尔也要抬头看看是否走错了方向。" },
+        Q: { name: "情", explain: "感性/痴念", mantra: "情不知所起，一往而深。", detail: "高分者用情极深。你拒绝冷漠，感性是你的引路灯。", advice: "爱人先爱己，别在感性的潮汐中迷失了自我。" },
+        K: { name: "狂", explain: "反叛/个性", mantra: "不入俗套，我自狂歌。", detail: "高分者不屑规则。你敢于向一切平庸挑战，卓尔不群。", advice: "你的独特很迷人，但适度的合群能让你走得更远。" },
+        Y: { name: "隐", explain: "出世/宁静", mantra: "采菊东篱，心远地偏。", detail: "高分者追求内心平静。渴望归隐，是喧嚣世界的观望者。", advice: "隐于市而非逃避，在尘世中找到属于你的安静角落。" }
+    };
 
-            // 女侠 - 正派
-            { g: "F", name: "黄蓉", img: "huangrong.png", mate: "郭靖", enemy: "欧阳锋", rarity: "江湖稀有度：2%（灵动剔透的玲珑心）", tag: "#智计百出", scores: {X:35, M:58, Z:30, Q:45, K:35, Y:20} },
-            { g: "F", name: "小龙女", img: "xiaolongnv.png", mate: "杨过", enemy: "尘世", rarity: "江湖稀有度：1%（至纯至净的古墓幽兰）", tag: "#至纯至净", scores: {X:25, M:15, Z:55, Q:50, K:25, Y:58} },
-            { g: "F", name: "任盈盈", img: "renyingying.png", mate: "令狐冲", enemy: "孤独", rarity: "江湖稀有度：5%（从容大度的圣姑雅量）", tag: "#从容大度", scores: {X:35, M:50, Z:40, Q:45, K:20, Y:40} },
-            { g: "F", name: "程灵素", img: "chenglingsu.png", mate: "胡斐", enemy: "自卑", rarity: "江湖稀有度：3%（深情无悔的蕙质兰心）", tag: "#深情无悔", scores: {X:45, M:55, Z:45, Q:50, K:15, Y:30} },
-            { g: "F", name: "郭襄", img: "guoxiang.png", mate: "杨过", enemy: "平庸", rarity: "江湖稀有度：4%（不改初心的灿烂火花）", tag: "#豪爽可爱", scores: {X:45, M:25, Z:20, Q:50, K:50, Y:35} },
-            { g: "F", name: "阿朱", img: "azhu.png", mate: "乔峰", enemy: "宿命", rarity: "江湖稀有度：6%（温柔体贴的解语灵花）", tag: "#温柔体贴", scores: {X:40, M:45, Z:30, Q:58, K:25, Y:20} },
-            { g: "F", name: "王语嫣", img: "wangyuyan.png", mate: "段誉", enemy: "虚情假意", rarity: "江湖稀有度：10%（博学多才的武学字典）", tag: "#博学多才", scores: {X:15, M:55, Z:35, Q:45, K:10, Y:30} },
-            { g: "F", name: "双儿", img: "shuange.png", mate: "韦小宝", enemy: "分离", rarity: "江湖稀有度：12%（纯善忠诚的完美伴侣）", tag: "#纯善忠诚", scores: {X:35, M:15, Z:50, Q:55, K:10, Y:25} },
-            { g: "F", name: "穆念慈", img: "munianci.png", mate: "杨康", enemy: "动摇", rarity: "江湖稀有度：8%（坚贞执着的如一初心）", tag: "#从一而终", scores: {X:30, M:10, Z:58, Q:55, K:15, Y:20} },
-            { g: "F", name: "仪琳", img: "yilin.png", mate: "令狐冲", enemy: "心魔", rarity: "江湖稀有度：9%（如水温柔的圣洁慈悲）", tag: "#如水温柔", scores: {X:35, M:5, Z:45, Q:50, K:10, Y:55} },
-            // 女侠 - 反派
-            { g: "F", name: "李莫愁", img: "limochou.png", mate: "陆展元", enemy: "何沅君", rarity: "江湖稀有度：3%（偏执疯狂的赤练情魔）", tag: "#问世间情为何物", scores: {X:15, M:35, Z:50, Q:58, K:50, Y:10} },
-            { g: "F", name: "梅超风", img: "meichaofeng.png", mate: "陈玄风", enemy: "江南七怪", rarity: "江湖稀有度：4%（孤独复仇的暗黑之光）", tag: "#孤独复仇", scores: {X:20, M:25, Z:55, Q:45, K:50, Y:15} },
-            { g: "F", name: "周芷若", img: "zhouzhiruo.png", mate: "张无忌", enemy: "赵敏", rarity: "江湖稀有度：5%（事业至上的黑化掌门）", tag: "#事业至上", scores: {X:25, M:50, Z:55, Q:40, K:35, Y:15} },
-            { g: "F", name: "康敏", img: "kangmin.png", mate: "美貌", enemy: "忽视她的人", rarity: "江湖稀有度：2%（极致危险的致命毒花）", tag: "#偏执疯狂", scores: {X:5, M:55, Z:45, Q:35, K:50, Y:5} },
-            { g: "F", name: "灭绝师太", img: "miejueshitai.png", mate: "峨眉声誉", enemy: "明教", rarity: "江湖稀有度：6%（铁腕偏执的唯我独尊者）", tag: "#唯我独尊", scores: {X:45, M:20, Z:58, Q:10, K:45, Y:5} },
-            { g: "F", name: "叶二娘", img: "yeerniang.png", mate: "虚竹", enemy: "玄慈", rarity: "江湖稀有度：8%（忆子成狂的悲情邪徒）", tag: "#忆子成狂", scores: {X:20, M:25, Z:40, Q:55, K:35, Y:15} },
-            { g: "F", name: "何铁手", img: "hetieshou.png", mate: "袁承志", enemy: "教务", rarity: "江湖稀有度：7%（亦正亦邪的娇媚妖女）", tag: "#亦正亦邪", scores: {X:25, M:45, Z:30, Q:35, K:55, Y:25} },
-            { g: "F", name: "裘千尺", img: "qiuqianchi.png", mate: "公孙止", enemy: "负心汉", rarity: "江湖稀有度：4%（恨之入骨的幽冥怨灵）", tag: "#恨之入骨", scores: {X:15, M:50, Z:55, Q:25, K:45, Y:5} },
-            { g: "F", name: "班淑娴", img: "banshuxian.png", mate: "何太冲", enemy: "小妾", rarity: "江湖稀有度：10%（掌控全局的悍妒名媛）", tag: "#掌控全局", scores: {X:20, M:40, Z:45, Q:20, K:40, Y:15} },
-            { g: "F", name: "毛东珠", img: "maodongzhu.png", mate: "瘦头陀", enemy: "假身份被识破", rarity: "江湖稀有度：12%（深不可测的暗影特工）", tag: "#深不可测", scores: {X:15, M:55, Z:40, Q:30, K:35, Y:15} },
-            // 女侠 - 奇人
-            { g: "F", name: "蓝凤凰", img: "lanfenghuang.png", mate: "令狐冲", enemy: "名门正派", rarity: "江湖稀有度：5%（率性而为的异域娇娃）", tag: "#率性而为", scores: {X:35, M:35, Z:25, Q:30, K:55, Y:25} },
-            { g: "F", name: "阿紫", img: "azi.png", mate: "乔峰", enemy: "游坦之", rarity: "江湖稀有度：3%（妖娇诡谲的顽劣火花）", tag: "#妖娇诡谲", scores: {X:15, M:45, Z:35, Q:50, K:55, Y:10} },
-            { g: "F", name: "天山童姥", img: "tianshantonglao.png", mate: "虚竹", enemy: "李秋水", rarity: "江湖稀有度：2%（硬核霸道的唯我独尊者）", tag: "#唯我独尊", scores: {X:25, M:40, Z:55, Q:30, K:58, Y:30} },
-            { g: "F", name: "赵敏", img: "zhaomin.png", mate: "张无忌", enemy: "周芷若", rarity: "江湖稀有度：4%（巾帼不让须眉的百变郡主）", tag: "#巾帼统帅", scores: {X:30, M:58, Z:40, Q:50, K:55, Y:15} },
-            { g: "F", name: "瑛姑", img: "yinggu.png", mate: "周伯通", enemy: "段智兴", rarity: "江湖稀有度：7%（爱恨交织的痴心奇人）", tag: "#爱恨交织", scores: {X:20, M:55, Z:55, Q:55, K:45, Y:20} },
-            { g: "F", name: "钟灵", img: "zhongling.png", mate: "段誉", enemy: "寂寞", rarity: "江湖稀有度：12%（娇俏可人的活泼甜心）", tag: "#娇俏可人", scores: {X:30, M:20, Z:20, Q:45, K:35, Y:40} },
-            { g: "F", name: "木婉清", img: "muwanqing.png", mate: "段誉", enemy: "俗世偏见", rarity: "江湖稀有度：6%（野性带刺的傲骨玫瑰）", tag: "#傲骨侠肠", scores: {X:35, M:15, Z:40, Q:55, K:50, Y:30} },
-            { g: "F", name: "建宁公主", img: "jianninggongzhu.png", mate: "韦小宝", enemy: "规矩", rarity: "江湖稀有度：5%（古灵精怪的抖M狂后）", tag: "#古灵精怪", scores: {X:15, M:20, Z:30, Q:45, K:58, Y:10} },
-            { g: "F", name: "史红石", img: "shihongshi.png", mate: "黄蓉", enemy: "陈友谅", rarity: "江湖稀有度：15%（初生牛犊的幼年帮主）", tag: "#初生牛犊", scores: {X:45, M:20, Z:35, Q:30, K:35, Y:15} },
-            { g: "F", name: "傻姑", img: "shagu.png", mate: "黄药师", enemy: "坏人", rarity: "江湖稀有度：8%（大智若愚的无邪真相）", tag: "#大智若愚", scores: {X:30, M:5, Z:25, Q:20, K:40, Y:55} }
-        ];
+    const roles = [
+        // 男侠 - 正派
+        { g:"M", name:"郭靖", img:"guojing.png", mate:"黄蓉", enemy:"欧阳锋", rarity:"江湖稀有度：1%（万中无一的纯粹大侠）", tag:"#侠之大者", scores:{X:55,M:15,Z:55,Q:30,K:10,Y:15} },
+        { g:"M", name:"乔峰", img:"qiaofeng.png", mate:"阿朱", enemy:"慕容复", rarity:"江湖稀有度：2%（悲剧英雄般的战神）", tag:"#义薄云天", scores:{X:55,M:25,Z:45,Q:35,K:25,Y:10} },
+        { g:"M", name:"令狐冲", img:"linghuchong.png", mate:"任盈盈", enemy:"岳不群", rarity:"江湖稀有度：5%（世间少有的自由灵魂）", tag:"#洒脱不羁", scores:{X:35,M:25,Z:15,Q:35,K:45,Y:45} },
+        { g:"M", name:"张无忌", img:"zhangwuji.png", mate:"赵敏", enemy:"成昆", rarity:"江湖稀有度：8%（宽厚温良的绝世高手）", tag:"#厚德载物", scores:{X:40,M:20,Z:25,Q:50,K:15,Y:30} },
+        { g:"M", name:"段誉", img:"duanyu.png", mate:"王语嫣", enemy:"鸠摩智", rarity:"江湖稀有度：6%（至情至性的痴情公子）", tag:"#至情至性", scores:{X:30,M:15,Z:20,Q:55,K:20,Y:40} },
+        { g:"M", name:"胡斐", img:"hufei.png", mate:"程灵素", enemy:"田归农", rarity:"江湖稀有度：10%（爱憎分明的热血刀客）", tag:"#爱憎分明", scores:{X:45,M:20,Z:35,Q:30,K:30,Y:15} },
+        { g:"M", name:"石破天", img:"shipotian.png", mate:"阿绣", enemy:"贝海石", rarity:"江湖稀有度：4%（返璞归真的赤子）", tag:"#大巧若拙", scores:{X:40,M:10,Z:45,Q:25,K:10,Y:50} },
+        { g:"M", name:"袁承志", img:"yuanchengzhi.png", mate:"温青青", enemy:"皇太极", rarity:"江湖稀有度：12%（端方持重的领袖才干）", tag:"#端方持重", scores:{X:45,M:30,Z:40,Q:30,K:15,Y:20} },
+        { g:"M", name:"陈家洛", img:"chenjialuo.png", mate:"香香公主", enemy:"乾隆", rarity:"江湖稀有度：15%（书生意气的理想主义者）", tag:"#书生意气", scores:{X:35,M:40,Z:30,Q:45,K:15,Y:15} },
+        { g:"M", name:"狄云", img:"diyun.png", mate:"水笙", enemy:"花铁干", rarity:"江湖稀有度：3%（在黑暗中涅槃的坚韧者）", tag:"#涅槃重生", scores:{X:35,M:15,Z:55,Q:40,K:10,Y:45} },
+        // 男侠 - 反派
+        { g:"M", name:"欧阳锋", img:"ouyangfeng.png", mate:"武学巅峰", enemy:"洪七公", rarity:"江湖稀有度：2%（偏执到极致的武痴）", tag:"#逆流而上", scores:{X:10,M:45,Z:55,Q:15,K:50,Y:10} },
+        { g:"M", name:"岳不群", img:"yuebuqun.png", mate:"辟邪剑谱", enemy:"令狐冲", rarity:"江湖稀有度：3%（极致隐忍的布局者）", tag:"#隐忍布局", scores:{X:15,M:55,Z:50,Q:10,K:20,Y:10} },
+        { g:"M", name:"金轮法王", img:"jinlunfawang.png", mate:"好徒儿", enemy:"杨过", rarity:"江湖稀有度：5%（自负巅峰的宗师）", tag:"#自负巅峰", scores:{X:20,M:35,Z:50,Q:20,K:25,Y:15} },
+        { g:"M", name:"慕容复", img:"murongfu.png", mate:"大燕皇位", enemy:"段誉", rarity:"江湖稀有度：4%（背负宿命的囚徒）", tag:"#执念成狂", scores:{X:15,M:45,Z:55,Q:15,K:25,Y:5} },
+        { g:"M", name:"林平之", img:"linpingzhi.png", mate:"岳灵珊", enemy:"余沧海", rarity:"江湖稀有度：6%（被仇恨淬炼的孤狼）", tag:"#向死而生", scores:{X:15,M:35,Z:55,Q:20,K:45,Y:5} },
+        { g:"M", name:"成昆", img:"chengkun.png", mate:"灭明教", enemy:"谢逊", rarity:"江湖稀有度：1%（算无遗策的暗影）", tag:"#算无遗策", scores:{X:5,M:58,Z:50,Q:25,K:30,Y:10} },
+        { g:"M", name:"游坦之", img:"youtanzhi.png", mate:"阿紫", enemy:"乔峰", rarity:"江湖稀有度：2%（卑微到尘埃的痴恋者）", tag:"#爱到尘埃", scores:{X:10,M:15,Z:55,Q:58,K:20,Y:5} },
+        { g:"M", name:"左冷禅", img:"zuolengchan.png", mate:"五岳盟主", enemy:"任我行", rarity:"江湖稀有度：5%（权谋至上的铁腕枭雄）", tag:"#权谋至上", scores:{X:10,M:50,Z:45,Q:10,K:35,Y:10} },
+        { g:"M", name:"丁春秋", img:"dingchunqiu.png", mate:"逍遥派", enemy:"虚竹", rarity:"江湖稀有度：7%（唯我独尊的狂徒）", tag:"#唯我独尊", scores:{X:5,M:40,Z:30,Q:15,K:55,Y:10} },
+        { g:"M", name:"田归农", img:"tianguinong.png", mate:"宝藏", enemy:"苗人凤", rarity:"江湖稀有度：10%（见缝插针的精致利己者）", tag:"#见缝插针", scores:{X:10,M:50,Z:35,Q:20,K:25,Y:15} },
+        // 男侠 - 奇人
+        { g:"M", name:"周伯通", img:"zhoubotong.png", mate:"瑛姑", enemy:"无聊", rarity:"江湖稀有度：1%（天真烂漫的顽童）", tag:"#天真烂漫", scores:{X:30,M:10,Z:20,Q:25,K:55,Y:50} },
+        { g:"M", name:"韦小宝", img:"weixiaobao.png", mate:"双儿", enemy:"苦差事", rarity:"江湖稀有度：2%（左右逢源的混世锦鲤）", tag:"#左右逢源", scores:{X:25,M:58,Z:15,Q:40,K:50,Y:20} },
+        { g:"M", name:"田伯光", img:"tianbiguang.png", mate:"令狐冲", enemy:"规矩", rarity:"江湖稀有度：8%（不落俗套的快活浪子）", tag:"#不落俗套", scores:{X:30,M:25,Z:20,Q:35,K:55,Y:25} },
+        { g:"M", name:"谢逊", img:"xiexun.png", mate:"张翠山", enemy:"成昆", rarity:"江湖稀有度：4%（狂暴而深邃的智者）", tag:"#金毛狮王", scores:{X:35,M:40,Z:45,Q:45,K:50,Y:15} },
+        { g:"M", name:"南海鳄神", img:"nanhaieshen.png", mate:"师父段誉", enemy:"规矩", rarity:"江湖稀有度：6%（言出必行的憨侠）", tag:"#言出必行", scores:{X:35,M:5,Z:40,Q:20,K:45,Y:15} },
+        { g:"M", name:"桃根仙", img:"taogenxian.png", mate:"五仙兄弟", enemy:"逻辑", rarity:"江湖稀有度：5%（思维跳脱的鬼才）", tag:"#胡搅蛮缠", scores:{X:25,M:35,Z:15,Q:20,K:55,Y:10} },
+        { g:"M", name:"祖千秋", img:"zuqianqiu.png", mate:"老不死", enemy:"没酒", rarity:"江湖稀有度：12%（雅癖古怪的奇人）", tag:"#饮酒专家", scores:{X:20,M:45,Z:30,Q:25,K:40,Y:25} },
+        { g:"M", name:"柯镇恶", img:"kezhenee.png", mate:"兄弟姐妹", enemy:"全天下恶人", rarity:"江湖稀有度：3%（一生不服的硬颈杠精）", tag:"#一生不服", scores:{X:55,M:5,Z:58,Q:25,K:45,Y:5} },
+        { g:"M", name:"虚竹", img:"xuzhu.png", mate:"梦姑", enemy:"破戒", rarity:"江湖稀有度：7%（随缘随性的佛系锦鲤）", tag:"#随缘随性", scores:{X:35,M:10,Z:40,Q:30,K:10,Y:55} },
+        { g:"M", name:"茅十八", img:"maoshiba.png", mate:"韦小宝", enemy:"官府", rarity:"江湖稀有度：15%（豪气干云的草莽英雄）", tag:"#豪气干云", scores:{X:50,M:10,Z:35,Q:25,K:35,Y:10} },
+        // 女侠 - 正派
+        { g:"F", name:"黄蓉", img:"huangrong.png", mate:"郭靖", enemy:"欧阳锋", rarity:"江湖稀有度：2%（灵动剔透的玲珑心）", tag:"#智计百出", scores:{X:35,M:58,Z:30,Q:45,K:35,Y:20} },
+        { g:"F", name:"小龙女", img:"xiaolongnv.png", mate:"杨过", enemy:"尘世", rarity:"江湖稀有度：1%（至纯至净的古墓幽兰）", tag:"#至纯至净", scores:{X:25,M:15,Z:55,Q:50,K:25,Y:58} },
+        { g:"F", name:"任盈盈", img:"renyingying.png", mate:"令狐冲", enemy:"孤独", rarity:"江湖稀有度：5%（从容大度的圣姑雅量）", tag:"#从容大度", scores:{X:35,M:50,Z:40,Q:45,K:20,Y:40} },
+        { g:"F", name:"程灵素", img:"chenglingsu.png", mate:"胡斐", enemy:"自卑", rarity:"江湖稀有度：3%（深情无悔的蕙质兰心）", tag:"#深情无悔", scores:{X:45,M:55,Z:45,Q:50,K:15,Y:30} },
+        { g:"F", name:"郭襄", img:"guoxiang.png", mate:"杨过", enemy:"平庸", rarity:"江湖稀有度：4%（不改初心的灿烂火花）", tag:"#豪爽可爱", scores:{X:45,M:25,Z:20,Q:50,K:50,Y:35} },
+        { g:"F", name:"阿朱", img:"azhu.png", mate:"乔峰", enemy:"宿命", rarity:"江湖稀有度：6%（温柔体贴的解语灵花）", tag:"#温柔体贴", scores:{X:40,M:45,Z:30,Q:58,K:25,Y:20} },
+        { g:"F", name:"王语嫣", img:"wangyuyan.png", mate:"段誉", enemy:"虚情假意", rarity:"江湖稀有度：10%（博学多才的武学字典）", tag:"#博学多才", scores:{X:15,M:55,Z:35,Q:45,K:10,Y:30} },
+        { g:"F", name:"双儿", img:"shuange.png", mate:"韦小宝", enemy:"分离", rarity:"江湖稀有度：12%（纯善忠诚的完美伴侣）", tag:"#纯善忠诚", scores:{X:35,M:15,Z:50,Q:55,K:10,Y:25} },
+        { g:"F", name:"穆念慈", img:"munianci.png", mate:"杨康", enemy:"动摇", rarity:"江湖稀有度：8%（坚贞执着的如一初心）", tag:"#从一而终", scores:{X:30,M:10,Z:58,Q:55,K:15,Y:20} },
+        { g:"F", name:"仪琳", img:"yilin.png", mate:"令狐冲", enemy:"心魔", rarity:"江湖稀有度：9%（如水温柔的圣洁慈悲）", tag:"#如水温柔", scores:{X:35,M:5,Z:45,Q:50,K:10,Y:55} },
+        // 女侠 - 反派
+        { g:"F", name:"李莫愁", img:"limochou.png", mate:"陆展元", enemy:"何沅君", rarity:"江湖稀有度：3%（偏执疯狂的赤练情魔）", tag:"#问世间情为何物", scores:{X:15,M:35,Z:50,Q:58,K:50,Y:10} },
+        { g:"F", name:"梅超风", img:"meichaofeng.png", mate:"陈玄风", enemy:"江南七怪", rarity:"江湖稀有度：4%（孤独复仇的暗黑之光）", tag:"#孤独复仇", scores:{X:20,M:25,Z:55,Q:45,K:50,Y:15} },
+        { g:"F", name:"周芷若", img:"zhouzhiruo.png", mate:"张无忌", enemy:"赵敏", rarity:"江湖稀有度：5%（事业至上的黑化掌门）", tag:"#事业至上", scores:{X:25,M:50,Z:55,Q:40,K:35,Y:15} },
+        { g:"F", name:"康敏", img:"kangmin.png", mate:"美貌", enemy:"忽视她的人", rarity:"江湖稀有度：2%（极致危险的致命毒花）", tag:"#偏执疯狂", scores:{X:5,M:55,Z:45,Q:35,K:50,Y:5} },
+        { g:"F", name:"灭绝师太", img:"miejueshitai.png", mate:"峨眉声誉", enemy:"明教", rarity:"江湖稀有度：6%（铁腕偏执的唯我独尊者）", tag:"#唯我独尊", scores:{X:45,M:20,Z:58,Q:10,K:45,Y:5} },
+        { g:"F", name:"叶二娘", img:"yeerniang.png", mate:"虚竹", enemy:"玄慈", rarity:"江湖稀有度：8%（忆子成狂的悲情邪徒）", tag:"#忆子成狂", scores:{X:20,M:25,Z:40,Q:55,K:35,Y:15} },
+        { g:"F", name:"何铁手", img:"hetieshou.png", mate:"袁承志", enemy:"教务", rarity:"江湖稀有度：7%（亦正亦邪的娇媚妖女）", tag:"#亦正亦邪", scores:{X:25,M:45,Z:30,Q:35,K:55,Y:25} },
+        { g:"F", name:"裘千尺", img:"qiuqianchi.png", mate:"公孙止", enemy:"负心汉", rarity:"江湖稀有度：4%（恨之入骨的幽冥怨灵）", tag:"#恨之入骨", scores:{X:15,M:50,Z:55,Q:25,K:45,Y:5} },
+        { g:"F", name:"班淑娴", img:"banshuxian.png", mate:"何太冲", enemy:"小妾", rarity:"江湖稀有度：10%（掌控全局的悍妒名媛）", tag:"#掌控全局", scores:{X:20,M:40,Z:45,Q:20,K:40,Y:15} },
+        { g:"F", name:"毛东珠", img:"maodongzhu.png", mate:"瘦头陀", enemy:"假身份被识破", rarity:"江湖稀有度：12%（深不可测的暗影特工）", tag:"#深不可测", scores:{X:15,M:55,Z:40,Q:30,K:35,Y:15} },
+        // 女侠 - 奇人
+        { g:"F", name:"蓝凤凰", img:"lanfenghuang.png", mate:"令狐冲", enemy:"名门正派", rarity:"江湖稀有度：5%（率性而为的异域娇娃）", tag:"#率性而为", scores:{X:35,M:35,Z:25,Q:30,K:55,Y:25} },
+        { g:"F", name:"阿紫", img:"azi.png", mate:"乔峰", enemy:"游坦之", rarity:"江湖稀有度：3%（妖娇诡谲的顽劣火花）", tag:"#妖娇诡谲", scores:{X:15,M:45,Z:35,Q:50,K:55,Y:10} },
+        { g:"F", name:"天山童姥", img:"tianshantonglao.png", mate:"虚竹", enemy:"李秋水", rarity:"江湖稀有度：2%（硬核霸道的唯我独尊者）", tag:"#唯我独尊", scores:{X:25,M:40,Z:55,Q:30,K:58,Y:30} },
+        { g:"F", name:"赵敏", img:"zhaomin.png", mate:"张无忌", enemy:"周芷若", rarity:"江湖稀有度：4%（巾帼不让须眉的百变郡主）", tag:"#巾帼统帅", scores:{X:30,M:58,Z:40,Q:50,K:55,Y:15} },
+        { g:"F", name:"瑛姑", img:"yinggu.png", mate:"周伯通", enemy:"段智兴", rarity:"江湖稀有度：7%（爱恨交织的痴心奇人）", tag:"#爱恨交织", scores:{X:20,M:55,Z:55,Q:55,K:45,Y:20} },
+        { g:"F", name:"钟灵", img:"zhongling.png", mate:"段誉", enemy:"寂寞", rarity:"江湖稀有度：12%（娇俏可人的活泼甜心）", tag:"#娇俏可人", scores:{X:30,M:20,Z:20,Q:45,K:35,Y:40} },
+        { g:"F", name:"木婉清", img:"muwanqing.png", mate:"段誉", enemy:"俗世偏见", rarity:"江湖稀有度：6%（野性带刺的傲骨玫瑰）", tag:"#傲骨侠肠", scores:{X:35,M:15,Z:40,Q:55,K:50,Y:30} },
+        { g:"F", name:"建宁公主", img:"jianninggongzhu.png", mate:"韦小宝", enemy:"规矩", rarity:"江湖稀有度：5%（古灵精怪的抖M狂后）", tag:"#古灵精怪", scores:{X:15,M:20,Z:30,Q:45,K:58,Y:10} },
+        { g:"F", name:"史红石", img:"shihongshi.png", mate:"黄蓉", enemy:"陈友谅", rarity:"江湖稀有度：15%（初生牛犊的幼年帮主）", tag:"#初生牛犊", scores:{X:45,M:20,Z:35,Q:30,K:35,Y:15} },
+        { g:"F", name:"傻姑", img:"shagu.png", mate:"黄药师", enemy:"坏人", rarity:"江湖稀有度：8%（大智若愚的无邪真相）", tag:"#大智若愚", scores:{X:30,M:5,Z:25,Q:20,K:40,Y:55} }
+    ];
 
-        const questions = [
-            { q: "在早高峰极度拥挤的地铁上，有人一直踩着你的鞋后跟却没道歉，你会？", options: [
-                {t: "直接回头，眼神犀利或干脆出声提醒。", s: {X:4, K:3}},
-                {t: "默默挪开位置，心里安慰自己对方也不是故意的。", s: {Y:5, Q:2}},
-                {t: "等下次地铁晃动，“不小心”也踩他一下回敬。", s: {M:4, Z:2}},
-                {t: "顺其自然", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "朋友邀请你去参加一个完全不认识人的高端酒会，你的第一反应是？", options: [
-                {t: "这是一个拓展人脉、观察各色人等的好机会。", s: {M:5, Z:2}},
-                {t: "太麻烦了，还是在家刷剧或钻研自己的爱好爽。", s: {Y:5, K:2}},
-                {t: "打扮得漂漂亮亮，去成为全场的焦点！", s: {K:5, Q:3}},
-                {t: "视情况而定", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "在网络上看到有人针对你热爱的某个领域发表谬论，你会？", options: [
-                {t: "必须列出证据，写长文反驳到底，维护真相。", s: {X:4, Z:5}},
-                {t: "这种杠精不值一提，关掉屏幕，内心毫无波澜。", s: {Y:5, M:2}},
-                {t: "用幽默或嘲讽的段子让对方哑口无言。", s: {K:4, M:3}},
-                {t: "以上均不符合", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "如果你中了千万大奖，但条件是必须去荒岛独自隐居三年，你会？", options: [
-                {t: "太棒了！终于可以摆脱社交，彻底清静了。", s: {Y:5, Z:3}},
-                {t: "绝对不行，没有人的生活对我来说是惩罚。", s: {Q:5, K:2}},
-                {t: "计算一下隐居三年的投资收益比，再做决定。", s: {M:5, Z:4}},
-                {t: "再想想", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "面对一份高薪但需要不断应酬、“戴着面具”生活的工作，你的态度是？", options: [
-                {t: "为了长远目标和掌控力，我可以忍受并演得很好。", s: {M:5, Z:5}},
-                {t: "这会磨灭我的个性，钱再多我也不伺候。", s: {K:5, X:3}},
-                {t: "纠结，会试图在其中寻找一个既能赚钱又真实的平衡点。", s: {Q:4, Y:2}},
-                {t: "看心情", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "暗恋已久的对象突然失恋来向你哭诉，你会？", options: [
-                {t: "极度共情，心疼不已，甚至想帮他/她去报仇。", s: {Q:5, X:3}},
-                {t: "理智分析，帮他/她看清前任的真面目并给出建议。", s: {M:5, Z:2}},
-                {t: "陪伴为主，但在心里衡量现在是不是表白的好时机。", s: {Z:4, M:3}},
-                {t: "不一定", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "如果你被误解成了一个“坏人”，且解释无效，你会？", options: [
-                {t: "无所谓，我行我素，这种“坏人”人设反而更自由。", s: {K:5, Y:4}},
-                {t: "极其痛苦，一定要通过行动默默证明自己的清白。", s: {Z:5, Q:3}},
-                {t: "利用这个误解，让那些想伤害我的人感到畏惧。", s: {M:5, X:2}},
-                {t: "随他去", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "在自助餐厅，你发现最后一个你爱吃的甜点被前面的人拿走了，你会？", options: [
-                {t: "算了，命里无时莫强求，吃点别的也行。", s: {Y:5, Q:2}},
-                {t: "去找厨师打听下一份什么时候出，一定要吃到。", s: {Z:5, M:2}},
-                {t: "开个玩笑问对方能不能分一半，或者干脆抢先一步。", s: {K:4, X:2}},
-                {t: "无感", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "你最希望自己在别人眼中是什么形象？", options: [
-                {t: "深不可测、掌控全局的智者或强者。", s: {M:5, Z:3}},
-                {t: "仗义、靠谱、值得信赖的伙伴。", s: {X:5, Q:3}},
-                {t: "独特、有趣、不按常理出牌的奇人。", s: {K:5, Y:2}},
-                {t: "都可以", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "当你发现一个社会性的不公平现象（如老人被欺负）时，你会？", options: [
-                {t: "热血上涌，哪怕有风险也要站出来发声或干预。", s: {X:5, K:3}},
-                {t: "评估风险，在保证自身安全的前提下寻求最优解（如报警）。", s: {M:5, Z:2}},
-                {t: "内心很愤慨，但深感个人力量渺小，只能默默避开。", s: {Y:4, Q:3}},
-                {t: "其他", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "对于“前任”寄来的结婚请柬，你的反应通常是？", options: [
-                {t: "大方送上祝福，甚至考虑去现场看看。", s: {X:3, Y:4}},
-                {t: "绝对不去，甚至想把请柬直接扔进垃圾桶并拉黑。", s: {Q:5, K:3}},
-                {t: "看对方是谁，分析去不去对自己的人格形象或社交更有利。", s: {M:5, Z:2}},
-                {t: "没感觉", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "如果穿越回古代，你最想掌握哪种生存技能？", options: [
-                {t: "绝世武功，一人一剑平天下。", s: {X:4, Z:5}},
-                {t: "易容术或奇门遁甲，玩转世界。", s: {M:5, K:4}},
-                {t: "顶级的医术或琴艺，过闲云野鹤的日子。", s: {Y:5, Q:3}},
-                {t: "都可以", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "关于“消费”，你更偏向于哪种风格？", options: [
-                {t: "千金难买我乐意，为了喜欢的东西可以瞬间清空购物车。", s: {K:5, Q:4}},
-                {t: "精打细算，每一分钱都要花在刀刃上。", s: {Z:5, M:3}},
-                {t: "极简主义，除了必需品，对其他物质欲望很低。", s: {Y:5, X:2}},
-                {t: "看心情", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "在团队合作中，你最受不了哪种人？", options: [
-                {t: "笨蛋，教了八遍还出错，影响我的进度。", s: {M:4, Z:5}},
-                {t: "没有原则、墙头草、甚至出卖朋友的人。", s: {X:5, Q:3}},
-                {t: "死板、没幽默感、只会按部就班的“机器人”。", s: {K:5, Y:2}},
-                {t: "都不行", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "当你心情极度糟糕时，你会选择如何排解？", options: [
-                {t: "找最亲近的人大哭一场或吐槽到天亮。", s: {Q:5, X:2}},
-                {t: "疯狂运动、工作或钻研难题，用成就感压过负面情绪。", s: {Z:5, M:2}},
-                {t: "找个没人的地方躲起来，切断联系，自我修复。", s: {Y:5, K:2}},
-                {t: "睡觉", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "如果你发现一个可能会致富但游走在法律边缘的“机会”，你会？", options: [
-                {t: "绝对不碰，做人做事底线高于一切。", s: {X:5, Z:3}},
-                {t: "研究其漏洞的风险系数，只要利益够大且能脱身就干。", s: {M:5, K:3}},
-                {t: "这种事太累太复杂，我只想安稳过日子。", s: {Y:5, Q:2}},
-                {t: "看情况", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "你如何看待“承诺”？", options: [
-                {t: "一诺千金，哪怕付出巨大代价也要完成。", s: {X:5, Z:5}},
-                {t: "承诺是基于当时情境的，情境变了，承诺也要灵活处理。", s: {M:5, K:3}},
-                {t: "很少给承诺，怕束缚了自己也耽误了别人。", s: {Y:5, Q:2}},
-                {t: "无所谓", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]},
-            { q: "如果生命剩下最后一天，你最想做的是？", options: [
-                {t: "把所有爱的人聚在一起，热热闹闹地告别。", s: {Q:5, X:3}},
-                {t: "完成那个一直没做完的、对你而言最重要的项目或心愿。", s: {Z:5, M:2}},
-                {t: "一个人去海边或山顶看日出日落，静静等待终结。", s: {Y:5, K:3}},
-                {t: "顺其自然", s: {X:1, M:1, Z:1, Q:1, K:1, Y:1}}
-            ]}
-        ];
+    const questions = [
+        { q:"在早高峰极度拥挤的地铁上，有人一直踩着你的鞋后跟却没道歉，你会？", options:[
+            {t:"直接回头，眼神犀利或干脆出声提醒。", s:{X:4,K:3}},
+            {t:"默默挪开位置，心里安慰自己对方也不是故意的。", s:{Y:5,Q:2}},
+            {t:"等下次地铁晃动，'不小心'也踩他一下回敬。", s:{M:4,Z:2}},
+            {t:"顺其自然", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"朋友邀请你去参加一个完全不认识人的高端酒会，你的第一反应是？", options:[
+            {t:"这是一个拓展人脉、观察各色人等的好机会。", s:{M:5,Z:2}},
+            {t:"太麻烦了，还是在家刷剧或钻研自己的爱好爽。", s:{Y:5,K:2}},
+            {t:"打扮得漂漂亮亮，去成为全场的焦点！", s:{K:5,Q:3}},
+            {t:"视情况而定", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"在网络上看到有人针对你热爱的某个领域发表谬论，你会？", options:[
+            {t:"必须列出证据，写长文反驳到底，维护真相。", s:{X:4,Z:5}},
+            {t:"这种杠精不值一提，关掉屏幕，内心毫无波澜。", s:{Y:5,M:2}},
+            {t:"用幽默或嘲讽的段子让对方哑口无言。", s:{K:4,M:3}},
+            {t:"以上均不符合", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"如果你中了千万大奖，但条件是必须去荒岛独自隐居三年，你会？", options:[
+            {t:"太棒了！终于可以摆脱社交，彻底清静了。", s:{Y:5,Z:3}},
+            {t:"绝对不行，没有人的生活对我来说是惩罚。", s:{Q:5,K:2}},
+            {t:"计算一下隐居三年的投资收益比，再做决定。", s:{M:5,Z:4}},
+            {t:"再想想", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"面对一份高薪但需要不断应酬、'戴着面具'生活的工作，你的态度是？", options:[
+            {t:"为了长远目标和掌控力，我可以忍受并演得很好。", s:{M:5,Z:5}},
+            {t:"这会磨灭我的个性，钱再多我也不伺候。", s:{K:5,X:3}},
+            {t:"纠结，会试图在其中寻找一个既能赚钱又真实的平衡点。", s:{Q:4,Y:2}},
+            {t:"看心情", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"暗恋已久的对象突然失恋来向你哭诉，你会？", options:[
+            {t:"极度共情，心疼不已，甚至想帮他/她去报仇。", s:{Q:5,X:3}},
+            {t:"理智分析，帮他/她看清前任的真面目并给出建议。", s:{M:5,Z:2}},
+            {t:"陪伴为主，但在心里衡量现在是不是表白的好时机。", s:{Z:4,M:3}},
+            {t:"不一定", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"如果你被误解成了一个'坏人'，且解释无效，你会？", options:[
+            {t:"无所谓，我行我素，这种'坏人'人设反而更自由。", s:{K:5,Y:4}},
+            {t:"极其痛苦，一定要通过行动默默证明自己的清白。", s:{Z:5,Q:3}},
+            {t:"利用这个误解，让那些想伤害我的人感到畏惧。", s:{M:5,X:2}},
+            {t:"随他去", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"在自助餐厅，你发现最后一个你爱吃的甜点被前面的人拿走了，你会？", options:[
+            {t:"算了，命里无时莫强求，吃点别的也行。", s:{Y:5,Q:2}},
+            {t:"去找厨师打听下一份什么时候出，一定要吃到。", s:{Z:5,M:2}},
+            {t:"开个玩笑问对方能不能分一半，或者干脆抢先一步。", s:{K:4,X:2}},
+            {t:"无感", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"你最希望自己在别人眼中是什么形象？", options:[
+            {t:"深不可测、掌控全局的智者或强者。", s:{M:5,Z:3}},
+            {t:"仗义、靠谱、值得信赖的伙伴。", s:{X:5,Q:3}},
+            {t:"独特、有趣、不按常理出牌的奇人。", s:{K:5,Y:2}},
+            {t:"都可以", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"当你发现一个社会性的不公平现象（如老人被欺负）时，你会？", options:[
+            {t:"热血上涌，哪怕有风险也要站出来发声或干预。", s:{X:5,K:3}},
+            {t:"评估风险，在保证自身安全的前提下寻求最优解（如报警）。", s:{M:5,Z:2}},
+            {t:"内心很愤慨，但深感个人力量渺小，只能默默避开。", s:{Y:4,Q:3}},
+            {t:"其他", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"对于'前任'寄来的结婚请柬，你的反应通常是？", options:[
+            {t:"大方送上祝福，甚至考虑去现场看看。", s:{X:3,Y:4}},
+            {t:"绝对不去，甚至想把请柬直接扔进垃圾桶并拉黑。", s:{Q:5,K:3}},
+            {t:"看对方是谁，分析去不去对自己的人格形象或社交更有利。", s:{M:5,Z:2}},
+            {t:"没感觉", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"如果穿越回古代，你最想掌握哪种生存技能？", options:[
+            {t:"绝世武功，一人一剑平天下。", s:{X:4,Z:5}},
+            {t:"易容术或奇门遁甲，玩转世界。", s:{M:5,K:4}},
+            {t:"顶级的医术或琴艺，过闲云野鹤的日子。", s:{Y:5,Q:3}},
+            {t:"都可以", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"关于'消费'，你更偏向于哪种风格？", options:[
+            {t:"千金难买我乐意，为了喜欢的东西可以瞬间清空购物车。", s:{K:5,Q:4}},
+            {t:"精打细算，每一分钱都要花在刀刃上。", s:{Z:5,M:3}},
+            {t:"极简主义，除了必需品，对其他物质欲望很低。", s:{Y:5,X:2}},
+            {t:"看心情", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"在团队合作中，你最受不了哪种人？", options:[
+            {t:"笨蛋，教了八遍还出错，影响我的进度。", s:{M:4,Z:5}},
+            {t:"没有原则、墙头草、甚至出卖朋友的人。", s:{X:5,Q:3}},
+            {t:"死板、没幽默感、只会按部就班的'机器人'。", s:{K:5,Y:2}},
+            {t:"都不行", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"当你心情极度糟糕时，你会选择如何排解？", options:[
+            {t:"找最亲近的人大哭一场或吐槽到天亮。", s:{Q:5,X:2}},
+            {t:"疯狂运动、工作或钻研难题，用成就感压过负面情绪。", s:{Z:5,M:2}},
+            {t:"找个没人的地方躲起来，切断联系，自我修复。", s:{Y:5,K:2}},
+            {t:"睡觉", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"如果你发现一个可能会致富但游走在法律边缘的'机会'，你会？", options:[
+            {t:"绝对不碰，做人做事底线高于一切。", s:{X:5,Z:3}},
+            {t:"研究其漏洞的风险系数，只要利益够大且能脱身就干。", s:{M:5,K:3}},
+            {t:"这种事太累太复杂，我只想安稳过日子。", s:{Y:5,Q:2}},
+            {t:"看情况", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"你如何看待'承诺'？", options:[
+            {t:"一诺千金，哪怕付出巨大代价也要完成。", s:{X:5,Z:5}},
+            {t:"承诺是基于当时情境的，情境变了，承诺也要灵活处理。", s:{M:5,K:3}},
+            {t:"很少给承诺，怕束缚了自己也耽误了别人。", s:{Y:5,Q:2}},
+            {t:"无所谓", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]},
+        { q:"如果生命剩下最后一天，你最想做的是？", options:[
+            {t:"把所有爱的人聚在一起，热热闹闹地告别。", s:{Q:5,X:3}},
+            {t:"完成那个一直没做完的、对你而言最重要的项目或心愿。", s:{Z:5,M:2}},
+            {t:"一个人去海边或山顶看日出日落，静静等待终结。", s:{Y:5,K:3}},
+            {t:"顺其自然", s:{X:1,M:1,Z:1,Q:1,K:1,Y:1}}
+        ]}
+    ];
 
-        let currentQ = 0;
-        let userScore = {X:0, M:0, Z:0, Q:0, K:0, Y:0};
-        let scoreHistory = [];
-        let selectedGender = "M";
-        let radarChart = null;
-        let radarChartPoster = null;
+    // ══════════════════════════════════════════════
+    //  状态
+    // ══════════════════════════════════════════════
+    let currentQ = 0;
+    let userScore = {X:0,M:0,Z:0,Q:0,K:0,Y:0};
+    let scoreHistory = [];
+    let selectedGender = "M";
+    let radarChart = null;
+    let radarChartPoster = null;
+    let currentBestMatch = null;
 
-        function selectGender(g) {
-            selectedGender = g;
-            document.getElementById('start-page').style.display = 'none';
-            document.getElementById('quiz-page').style.display = 'flex';
-            currentQ = 0;
-            userScore = {X:0, M:0, Z:0, Q:0, K:0, Y:0};
-            scoreHistory = [];
-            showQuestion();
-            const qrContainer = document.getElementById("qrcode");
-            qrContainer.innerHTML = '';
-            new QRCode(qrContainer, { text: window.location.href, width: 45, height: 45 });
-        }
+    // ══════════════════════════════════════════════
+    //  进度条
+    // ══════════════════════════════════════════════
+    function updateProgress(n, total) {
+        document.getElementById('progress-bar-wrap').style.display = 'block';
+        document.getElementById('progress-bar').style.width = ((n / total) * 100) + '%';
+    }
+    function hideProgress() {
+        document.getElementById('progress-bar-wrap').style.display = 'none';
+        document.getElementById('progress-bar').style.width = '0%';
+    }
 
-        function showQuestion() {
-            const q = questions[currentQ];
-            document.getElementById('question-text').innerText = q.q;
-            document.getElementById('q-count').innerText = `${String(currentQ + 1).padStart(2, '0')} / ${questions.length}`;
-            document.getElementById('prev-btn').style.visibility = currentQ > 0 ? 'visible' : 'hidden';
-            
-            const optionsDiv = document.getElementById('options');
-            optionsDiv.innerHTML = '';
-            q.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "option-btn w-full p-4 text-left bg-white border border-gray-100 rounded-2xl hover:border-ink hover:bg-[#fafafa] text-sm font-medium active:scale-95 shadow-sm";
-                btn.innerText = opt.t;
-                btn.onclick = () => next(opt.s);
-                optionsDiv.appendChild(btn);
-            });
-        }
+    // ══════════════════════════════════════════════
+    //  页面切换
+    // ══════════════════════════════════════════════
+    function showPage(id) {
+        document.getElementById('start-page').style.display  = (id === 'start-page')  ? 'flex'  : 'none';
+        document.getElementById('quiz-page').style.display   = (id === 'quiz-page')   ? 'flex'  : 'none';
+        document.getElementById('result-page').style.display = (id === 'result-page') ? 'block' : 'none';
+    }
 
-        function next(score) {
+    function selectGender(g) {
+        selectedGender = g;
+        currentQ = 0;
+        userScore = {X:0,M:0,Z:0,Q:0,K:0,Y:0};
+        scoreHistory = [];
+        showPage('quiz-page');
+        updateProgress(0, TOTAL_Q);
+        showQuestion();
+    }
+
+    // ══════════════════════════════════════════════
+    //  答题逻辑
+    // ══════════════════════════════════════════════
+    function showQuestion() {
+        const q = questions[currentQ];
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('q-count').innerText = `${String(currentQ+1).padStart(2,'0')} / ${TOTAL_Q}`;
+        document.getElementById('prev-btn').style.visibility = currentQ > 0 ? 'visible' : 'hidden';
+        updateProgress(currentQ, TOTAL_Q);
+
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "option-btn w-full p-4 text-left bg-white border border-gray-100 rounded-2xl hover:border-ink hover:bg-[#fafafa] text-sm font-medium shadow-sm";
+            btn.innerText = opt.t;
+            btn.onclick = () => handleSelect(btn, opt.s);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function handleSelect(btn, score) {
+        // 禁止重复点击
+        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+        // 选中高亮
+        btn.classList.add('selected');
+        // 150ms 后跳题
+        setTimeout(() => {
             scoreHistory.push(JSON.parse(JSON.stringify(userScore)));
-            for(let key in score) userScore[key] += score[key];
+            for (let key in score) userScore[key] += score[key];
             currentQ++;
-            if(currentQ < questions.length) {
+            if (currentQ < TOTAL_Q) {
                 showQuestion();
             } else {
                 showResult();
             }
-        }
+        }, 150);
+    }
 
-        function prev() {
-            if(currentQ > 0) {
-                currentQ--;
-                userScore = scoreHistory.pop();
-                showQuestion();
+    function prev() {
+        if (currentQ > 0) {
+            currentQ--;
+            userScore = scoreHistory.pop();
+            showQuestion();
+        }
+    }
+
+    // ══════════════════════════════════════════════
+    //  匹配算法（归一化后再比较）
+    // ══════════════════════════════════════════════
+    function normalizeScore(raw) {
+        // 用户每维度理论最大分：每题选最高分(5)×18题 = 90
+        // 但实际每题只有部分维度得分，理论上限偏低，用动态计算更准
+        // 简单处理：将 userScore 各维等比缩放到 [0, MAX_ROLE_SCORE]
+        const keys = Object.keys(raw);
+        const maxVal = Math.max(...keys.map(k => raw[k]));
+        if (maxVal === 0) return {...raw};
+        const normalized = {};
+        keys.forEach(k => {
+            normalized[k] = (raw[k] / maxVal) * MAX_ROLE_SCORE;
+        });
+        return normalized;
+    }
+
+    function findBestMatch(gender) {
+        const genderRoles = roles.filter(r => r.g === gender);
+        const normalized = normalizeScore(userScore);
+        let bestMatch = genderRoles[0];
+        let minDiff = Infinity;
+        genderRoles.forEach(role => {
+            let diff = 0;
+            for (let key in role.scores) {
+                diff += Math.pow(normalized[key] - role.scores[key], 2);
             }
-        }
+            if (diff < minDiff) { minDiff = diff; bestMatch = role; }
+        });
+        return bestMatch;
+    }
 
-        function initRadar(canvasId, dataValues) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            return new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ["侠", "谋", "执", "情", "狂", "隐"],
-                    datasets: [{
-                        data: dataValues,
-                        backgroundColor: 'rgba(150, 47, 35, 0.15)',
-                        borderColor: '#962f23',
-                        borderWidth: 2,
-                        pointRadius: 0
-                    }]
+    // ══════════════════════════════════════════════
+    //  雷达图
+    // ══════════════════════════════════════════════
+    function initRadar(canvasId, dataValues) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        const labelSize = window.innerWidth < 400 ? 11 : 13;
+        return new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ["侠","谋","执","情","狂","隐"],
+                datasets: [{
+                    data: dataValues,
+                    backgroundColor: 'rgba(150,47,35,0.15)',
+                    borderColor: '#962f23',
+                    borderWidth: 2,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 60,
+                        ticks: { display: false, stepSize: 20 },
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        pointLabels: { font: { size: labelSize, weight: 'bold' }, color: '#1a1a1a' }
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            min: 0,
-                            max: 60,
-                            ticks: { display: false, stepSize: 20 },
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            pointLabels: { font: { size: 12, weight: 'bold' }, color: '#1a1a1a' }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
 
-        function showResult() {
-            document.getElementById('quiz-page').style.display = 'none';
-            document.getElementById('result-page').classList.remove('hidden');
-            window.scrollTo(0,0);
+    // ══════════════════════════════════════════════
+    //  显示结果
+    // ══════════════════════════════════════════════
+    function showResult() {
+        showPage('result-page');
+        hideProgress();
+        window.scrollTo(0, 0);
 
-            const genderRoles = roles.filter(r => r.g === selectedGender);
-            let bestMatch = genderRoles[0];
-            let minDiff = Infinity;
-            
-            genderRoles.forEach(role => {
-                let diff = 0;
-                for(let key in role.scores) {
-                    diff += Math.pow((userScore[key] || 0) - role.scores[key], 2);
-                }
-                if(diff < minDiff) { minDiff = diff; bestMatch = role; }
-            });
+        currentBestMatch = findBestMatch(selectedGender);
+        const bestMatch = currentBestMatch;
 
-            // 填充基础信息
-            const fields = ['name', 'tag', 'rarity', 'mate', 'enemy'];
-            fields.forEach(f => {
-                document.getElementById('role-' + f).innerText = bestMatch[f];
-                document.getElementById('p-' + f).innerText = bestMatch[f];
-            });
+        // 填充基础信息
+        ['name','tag','rarity','mate','enemy'].forEach(f => {
+            document.getElementById('role-' + f).innerText = bestMatch[f];
+        });
+        document.getElementById('role-img-display').src = bestMatch.img;
+        document.getElementById('role-img-display').alt = bestMatch.name;
 
-            // 填充图片
-            document.getElementById('role-img-display').src = bestMatch.img;
-            document.getElementById('p-img-display').src = bestMatch.img;
+        // 最高分维度
+        const normalized = normalizeScore(userScore);
+        const topTraitKey = Object.keys(normalized).reduce((a, b) => normalized[a] > normalized[b] ? a : b);
+        const topTrait = traitInfo[topTraitKey];
 
-            // 逻辑：获取最高分维度
-            const topTraitKey = Object.keys(userScore).reduce((a, b) => userScore[a] > userScore[b] ? a : b);
-            const topTrait = traitInfo[topTraitKey];
+        document.getElementById('role-mantra').innerText = topTrait.mantra;
+        document.getElementById('role-desc').innerText = `你在现代生活中展现出的${bestMatch.tag}特质，与${bestMatch.name}的灵魂高度契合。${topTrait.detail}`;
+        document.getElementById('role-advice').innerText = topTrait.advice;
 
-            // 填充文案模块
-            document.getElementById('role-mantra').innerText = topTrait.mantra;
-            document.getElementById('role-desc').innerText = `你在现代生活中展现出的${bestMatch.tag}特质，与${bestMatch.name}的灵魂高度契合。${topTrait.detail}`;
-            document.getElementById('role-advice').innerText = topTrait.advice;
-            
-            // 同步到海报文案
-            document.getElementById('p-desc').innerText = `【${topTrait.mantra}】 ${topTrait.detail}`;
+        // 雷达图用归一化分数，使量程与角色一致
+        const vals = [normalized.X, normalized.M, normalized.Z, normalized.Q, normalized.K, normalized.Y].map(v => Math.round(v));
+        if (radarChart) radarChart.destroy();
+        radarChart = initRadar('radarChart', vals);
+    }
 
-            const userValues = [userScore.X, userScore.M, userScore.Z, userScore.Q, userScore.K, userScore.Y];
-            if(radarChart) radarChart.destroy();
-            radarChart = initRadar('radarChart', userValues);
-            if(radarChartPoster) radarChartPoster.destroy();
-            radarChartPoster = initRadar('radarChartPoster', userValues);
-        }
+    // ══════════════════════════════════════════════
+    //  海报生成（按需初始化，动态 scale）
+    // ══════════════════════════════════════════════
+    function generatePoster() {
+        const overlay = document.getElementById('poster-overlay');
+        overlay.style.display = 'flex';
+        // iOS Safari 滚动锁定
+        document.body.style.overflow = 'hidden';
 
-        function generatePoster() {
-            const overlay = document.getElementById('poster-overlay');
-            overlay.style.display = 'flex';
-            const container = document.getElementById('poster-img-container');
-            container.innerHTML = '<p class="text-white text-xs tracking-widest">正在为您手绘江湖真意...</p>';
+        const container = document.getElementById('poster-img-container');
+        container.innerHTML = '<p class="text-white text-xs tracking-widest">正在为您手绘江湖真意...</p>';
+
+        const bestMatch = currentBestMatch;
+        const normalized = normalizeScore(userScore);
+        const topTraitKey = Object.keys(normalized).reduce((a, b) => normalized[a] > normalized[b] ? a : b);
+        const topTrait = traitInfo[topTraitKey];
+        const vals = [normalized.X, normalized.M, normalized.Z, normalized.Q, normalized.K, normalized.Y].map(v => Math.round(v));
+
+        // 填充海报元素
+        document.getElementById('p-rarity').innerText = bestMatch.rarity;
+        document.getElementById('p-name').innerText = bestMatch.name;
+        document.getElementById('p-tag').innerText = bestMatch.tag;
+        document.getElementById('p-mate').innerText = bestMatch.mate;
+        document.getElementById('p-enemy').innerText = bestMatch.enemy;
+        document.getElementById('p-img-display').src = bestMatch.img;
+        document.getElementById('p-img-display').alt = bestMatch.name;
+        document.getElementById('p-desc').innerText = `【${topTrait.mantra}】 ${topTrait.detail}`;
+
+        // 显示离屏容器
+        const posterContainer = document.getElementById('poster-container');
+        posterContainer.style.display = 'block';
+
+        // 延迟等待图片加载，再初始化海报雷达图，再截图
+        setTimeout(() => {
+            if (radarChartPoster) { radarChartPoster.destroy(); radarChartPoster = null; }
+            radarChartPoster = initRadar('radarChartPoster', vals);
+
+            // 生成 QR 码
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, { text: window.location.href, width: 48, height: 48 });
+
+            // 动态 scale，避免低端机 OOM
+            const scale = Math.min(window.devicePixelRatio || 2, 2);
 
             setTimeout(() => {
-                html2canvas(document.getElementById('poster-container'), { 
-                    scale: 3, useCORS: true, width: 375, windowWidth: 375 
+                html2canvas(posterContainer, {
+                    scale, useCORS: true, width: 375, windowWidth: 375
                 }).then(canvas => {
                     const img = new Image();
                     img.src = canvas.toDataURL('image/png');
                     container.innerHTML = '';
                     container.appendChild(img);
+                    // 截图完成后隐藏离屏容器
+                    posterContainer.style.display = 'none';
+                    if (radarChartPoster) { radarChartPoster.destroy(); radarChartPoster = null; }
+                }).catch(() => {
+                    container.innerHTML = '<p class="text-red-400 text-xs">生成失败，请重试</p>';
                 });
-            }, 600);
-        }
+            }, 400);
+        }, 300);
+    }
 
-        function closePoster() {
-            document.getElementById('poster-overlay').style.display = 'none';
-        }
+    function closePoster() {
+        document.getElementById('poster-overlay').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // ══════════════════════════════════════════════
+    //  重新测试（不刷页）
+    // ══════════════════════════════════════════════
+    function resetQuiz() {
+        currentQ = 0;
+        userScore = {X:0,M:0,Z:0,Q:0,K:0,Y:0};
+        scoreHistory = [];
+        currentBestMatch = null;
+        if (radarChart) { radarChart.destroy(); radarChart = null; }
+        hideProgress();
+        showPage('start-page');
+        window.scrollTo(0, 0);
+    }
     </script>
 </body>
 </html>
