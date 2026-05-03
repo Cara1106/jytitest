@@ -138,54 +138,83 @@
             <span class="text-xs font-bold text-gold tracking-widest" id="q-count">01 / 18</span>
         </div>
         <div class="space-y-10 centered-container">
-            <h2 id="question-text" class="text-2xl font-[900] text-ink leading-snug px-4">载入中...</h2>
+            <h2 id="question-text" class="text-l font-[900] text-ink leading-snug px-4">载入中...</h2>
             <div id="options" class="space-y-4 w-full"></div>
         </div>
     </div>
 
     <!-- ══════════════ 结果页 ══════════════ -->
-    <div id="result-page" class="max-w-md w-full space-y-6 px-4 pb-12 pt-8" style="display:none;">
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-50 relative centered-container">
-            <div id="role-rarity" class="text-center text-[11px] font-bold text-gold tracking-[0.2em] mb-6 px-4 py-1 border border-gold/20 rounded-full"></div>
+    <div id="result-page" class="max-w-md w-full space-y-5 px-4 pb-12 pt-8" style="display:none;">
 
-            <div class="text-center mb-4 flex flex-col items-center">
-                <img id="role-img-display" src="" alt="" class="role-image">
-                <h2 id="role-name" class="text-5xl font-[900] text-ink tracking-tighter"></h2>
-                <p id="role-tag" class="text-[11px] font-bold text-vermilion tracking-[0.2em] mt-2"></p>
+        <!-- ① 角色头部卡片 -->
+        <div class="bg-white px-6 pt-6 pb-5 rounded-[2.5rem] shadow-sm border border-gray-50 centered-container">
+            <div id="role-rarity" class="text-[10px] font-bold text-gold tracking-[0.2em] mb-5 px-4 py-1 border border-gold/20 rounded-full text-center"></div>
+            <img id="role-img-display" src="" alt="" class="role-image">
+            <h2 id="role-name" class="text-5xl font-[900] text-ink tracking-tighter mt-1"></h2>
+            <p id="role-tag" class="text-[11px] font-bold text-vermilion tracking-[0.2em] mt-2 mb-5"></p>
+            <div class="chart-wrap w-full"><canvas id="radarChart"></canvas></div>
+        </div>
+
+        <!-- ② 武学心法 -->
+        <div class="bg-parchment px-6 py-5 rounded-3xl border-l-4 border-vermilion">
+            <span class="text-[10px] font-bold text-vermilion block mb-2 tracking-widest">◎ 武学心法</span>
+            <p id="role-mantra" class="text-gray-800 text-sm leading-relaxed font-bold italic"></p>
+        </div>
+
+        <!-- ③ 江湖原型解析 -->
+        <div class="bg-white px-6 py-5 rounded-3xl border border-gray-100 shadow-sm">
+            <span class="text-[10px] font-bold text-gray-400 block mb-3 tracking-widest">◎ 江湖原型解析</span>
+            <p id="role-desc" class="text-gray-700 text-[13px] leading-7"></p>
+        </div>
+
+        <!-- ④ 六维雷达解读 -->
+        <div class="bg-white px-6 py-5 rounded-3xl border border-gray-100 shadow-sm">
+            <span class="text-[10px] font-bold text-gray-400 block mb-4 tracking-widest">◎ 六维能量解读</span>
+            <div id="role-traits" class="space-y-4"></div>
+        </div>
+
+        <!-- ⑤ 优势与软肋 -->
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white px-4 py-5 rounded-3xl border border-gray-100 shadow-sm">
+                <span class="text-[10px] font-bold tracking-widest block mb-3" style="color:#2a6b3f">◎ 江湖优势</span>
+                <ul id="role-strengths" class="space-y-2 text-[12px] text-gray-600 leading-relaxed list-none"></ul>
             </div>
-
-            <div class="chart-wrap mb-4"><canvas id="radarChart"></canvas></div>
-
-            <div class="space-y-4 w-full text-left">
-                <div class="bg-parchment p-5 rounded-2xl border-l-4 border-vermilion">
-                    <span class="text-[10px] font-bold text-vermilion block mb-2 uppercase tracking-widest">◎ 武学心法</span>
-                    <p id="role-mantra" class="text-gray-700 text-xs leading-relaxed font-bold"></p>
-                </div>
-
-                <div class="p-2">
-                    <span class="text-[10px] font-bold text-gray-400 block mb-2 uppercase tracking-widest text-center">◎ 江湖原型解析</span>
-                    <p id="role-desc" class="text-gray-600 text-xs leading-relaxed text-center px-2"></p>
-                </div>
-
-                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <span class="text-[10px] font-bold text-gold block mb-2 uppercase tracking-widest text-center">◎ 给当代侠客的建议</span>
-                    <p id="role-advice" class="text-gray-500 text-[11px] leading-relaxed text-center"></p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 pt-2 text-center">
-                    <div class="bg-gray-50 py-3 rounded-xl border border-gray-100 flex flex-col justify-center">
-                        <span class="text-gray-400 text-[8px] mb-1 uppercase tracking-tighter">灵魂伴侣</span>
-                        <span id="role-mate" class="text-ink font-bold text-xs"></span>
-                    </div>
-                    <div class="bg-gray-50 py-3 rounded-xl border border-gray-100 flex flex-col justify-center">
-                        <span class="text-gray-400 text-[8px] mb-1 uppercase tracking-tighter">一生之敌</span>
-                        <span id="role-enemy" class="text-ink font-bold text-xs"></span>
-                    </div>
-                </div>
+            <div class="bg-white px-4 py-5 rounded-3xl border border-gray-100 shadow-sm">
+                <span class="text-[10px] font-bold text-vermilion tracking-widest block mb-3">◎ 致命软肋</span>
+                <ul id="role-weaknesses" class="space-y-2 text-[12px] text-gray-600 leading-relaxed list-none"></ul>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 px-2">
+        <!-- ⑥ 当代行为画像 -->
+        <div class="bg-white px-6 py-5 rounded-3xl border border-gray-100 shadow-sm">
+            <span class="text-[10px] font-bold text-gray-400 block mb-4 tracking-widest">◎ 当代侠客行为画像</span>
+            <div id="role-modern" class="space-y-3"></div>
+        </div>
+
+        <!-- ⑦ 给当代侠客的建议 -->
+        <div class="bg-white px-6 py-5 rounded-3xl border border-gray-100 shadow-sm">
+            <span class="text-[10px] font-bold text-gold block mb-3 tracking-widest">◎ 给当代侠客的建议</span>
+            <p id="role-advice" class="text-gray-600 text-[13px] leading-7"></p>
+        </div>
+
+        <!-- ⑧ 三联关系卡 -->
+        <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-white py-4 px-1 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-center">
+                <span class="text-gray-400 text-[8px] mb-1 tracking-tighter">灵魂伴侣</span>
+                <span id="role-mate" class="text-ink font-bold text-xs"></span>
+            </div>
+            <div class="bg-white py-4 px-1 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-center">
+                <span class="text-gray-400 text-[8px] mb-1 tracking-tighter">一生之敌</span>
+                <span id="role-enemy" class="text-ink font-bold text-xs"></span>
+            </div>
+            <div class="bg-white py-4 px-1 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-center">
+                <span class="text-gray-400 text-[8px] mb-1 tracking-tighter">同道中人</span>
+                <span id="role-peer" class="text-ink font-bold text-xs"></span>
+            </div>
+        </div>
+
+        <!-- ⑨ 按钮 -->
+        <div class="grid grid-cols-2 gap-4 px-2 pt-2">
             <button onclick="generatePoster()" class="py-4 bg-vermilion text-white rounded-2xl font-bold shadow-lg active:scale-95 transition">生成海报</button>
             <button onclick="resetQuiz()" class="py-4 bg-white text-ink border border-gray-200 rounded-2xl font-bold active:scale-95 transition">重新测试</button>
         </div>
@@ -231,81 +260,165 @@
     const MAX_ROLE_SCORE = 60; // 角色预设上限
 
     const traitInfo = {
-        X: { name: "侠", explain: "侠义/利他", mantra: "为国为民，侠之大者。", detail: "高分者不畏强权，看重社会公义。你内心藏着守护者的灵魂。", advice: "坚持你的原则，但也要学会在规则内保护自己。" },
-        M: { name: "谋", explain: "策略/洞察", mantra: "运筹帷幄，决胜千里。", detail: "高分者洞察人性，布局深远。理性和逻辑是你最锋利的武器。", advice: "聪明是天赋，但别让算计盖过了真诚。" },
-        Z: { name: "执", explain: "定力/持久", mantra: "纵有万难，绝不回头。", detail: "高分者百折不挠。一旦认定目标，纵有万千阻碍亦不回头。", advice: "坚毅是好事，但偶尔也要抬头看看是否走错了方向。" },
-        Q: { name: "情", explain: "感性/痴念", mantra: "情不知所起，一往而深。", detail: "高分者用情极深。你拒绝冷漠，感性是你的引路灯。", advice: "爱人先爱己，别在感性的潮汐中迷失了自我。" },
-        K: { name: "狂", explain: "反叛/个性", mantra: "不入俗套，我自狂歌。", detail: "高分者不屑规则。你敢于向一切平庸挑战，卓尔不群。", advice: "你的独特很迷人，但适度的合群能让你走得更远。" },
-        Y: { name: "隐", explain: "出世/宁静", mantra: "采菊东篱，心远地偏。", detail: "高分者追求内心平静。渴望归隐，是喧嚣世界的观望者。", advice: "隐于市而非逃避，在尘世中找到属于你的安静角落。" }
+        X: {
+            name: "侠", explain: "侠义/利他", mantra: "为国为民，侠之大者。",
+            detail: "高分者不畏强权，看重社会公义。你内心藏着守护者的灵魂。",
+            desc_high: "你的侠气值极高——这意味着你对「正义」有强烈的直觉感知，面对不公时几乎无法袖手旁观。你天然站在弱者一侧，哪怕代价落在自己身上。",
+            desc_mid:  "你对公义有感知，但会权衡现实成本。不是冷漠，而是懂得选择战场。",
+            desc_low:  "侠气并非你的主旋律，你更专注于自身的目标与圈子，对宏大叙事保持距离。",
+            strengths: ["关键时刻挺身而出，赢得深度信任", "有清晰的道德底线，不容易被利益收买", "擅长凝聚人心，天然的旗帜人物"],
+            weaknesses: ["容易因「路见不平」消耗自身资源", "对背叛与不义的容忍度极低，易产生激烈冲突", "有时过于理想化，低估了现实的复杂性"],
+            modern: [
+                { icon: "💼", label: "职场", text: "是团队里第一个指出问题的人，也是最容易因此得罪人的人。适合需要担当的角色，但要学会保护自己。" },
+                { icon: "💬", label: "社交", text: "朋友圈里的「正义使者」，但要注意边界——不是所有人都需要被拯救。" },
+                { icon: "❤️", label: "亲密", text: "对伴侣忠诚度极高，但容易把「保护」演变成「控制」。" }
+            ],
+            advice: "你的侠骨是这个时代稀缺的品质，不要被磨平。但请记住：郭靖守襄阳，也懂得选择时机与盟友。以智辅侠，才能走得更远。"
+        },
+        M: {
+            name: "谋", explain: "策略/洞察", mantra: "运筹帷幄，决胜千里。",
+            detail: "高分者洞察人性，布局深远。理性和逻辑是你最锋利的武器。",
+            desc_high: "你的谋略值很高——你习惯在行动前先在脑海里推演三步。你能看穿动机、识别规律、在混乱中找到结构，这是极少数人真正具备的能力。",
+            desc_mid:  "你有策略思维，但不会为了「赢」而失去人情味。聪明与温度在你身上并存。",
+            desc_low:  "你更依赖直觉与感受，而非精密计算。这让你更真实，但有时会措手不及。",
+            strengths: ["能快速看穿局势与人心", "危机中保持冷静，是天然的「稳定器」", "善于借力，四两拨千斤"],
+            weaknesses: ["容易过度分析，行动力被思考拖慢", "有时让人感觉「算计」而失去亲近感", "对「无法掌控」的情况高度焦虑"],
+            modern: [
+                { icon: "💼", label: "职场", text: "天然适合策略、咨询、项目管理类角色。你在复杂博弈中如鱼得水，但要注意不要把每个合作都变成「对手局」。" },
+                { icon: "💬", label: "社交", text: "是聚会里最会「读空气」的人，但别让这种敏锐变成表演。真正的朋友需要你卸下盔甲。" },
+                { icon: "❤️", label: "亲密", text: "你会把伴侣研究得很透彻，但爱情有时需要你放弃「掌控感」，允许意外发生。" }
+            ],
+            advice: "黄蓉的聪明从不让人生厌，因为她的谋略里始终藏着真心。让你的智识服务于连接，而非防御。"
+        },
+        Z: {
+            name: "执", explain: "定力/持久", mantra: "纵有万难，绝不回头。",
+            detail: "高分者百折不挠。一旦认定目标，纵有万千阻碍亦不回头。",
+            desc_high: "你的执念值极高——你是那种一旦认定方向就很难被说服放弃的人。挫折对你来说是燃料而非终点，这份韧性让你能做成绝大多数人做不到的事。",
+            desc_mid:  "你有足够的坚持，也知道适时调整。执与变之间，你拿捏得还不错。",
+            desc_low:  "你更灵活，也更容易放下。这是适应力，但也要小心别把放弃合理化。",
+            strengths: ["极强的目标感，不达目的不罢休", "逆境中愈战愈勇，是团队的定海神针", "一旦承诺，绝对兑现"],
+            weaknesses: ["对「方向错误」的感知迟钝，容易在错误的路上走太远", "难以接受突然的变化，适应力相对弱", "有时会把「坚持」变成对他人的压力"],
+            modern: [
+                { icon: "💼", label: "职场", text: "最适合长周期、高难度的项目。你是创业者、研究者、马拉松运动员的人格底色。但要定期检验方向是否还正确。" },
+                { icon: "💬", label: "社交", text: "朋友眼里最靠谱的那个。但你的坚持有时会让人觉得「轴」，学会倾听反对意见是功课。" },
+                { icon: "❤️", label: "亲密", text: "对感情的投入是100%，但要小心把「执着」变成「消耗」。有时放手是另一种爱。" }
+            ],
+            advice: "郭靖守城，靠的是执——但他也懂得看天时、知进退。用你的韧性，但别忘了给自己和他人留一点余地。"
+        },
+        Q: {
+            name: "情", explain: "感性/痴念", mantra: "情不知所起，一往而深。",
+            detail: "高分者用情极深。你拒绝冷漠，感性是你的引路灯。",
+            desc_high: "你的情感值极深——你对世界的感知是感性先于理性的。你能接收到别人接收不到的情绪信号，你的爱与恨都比常人浓烈三倍。这是天赋，也是负重。",
+            desc_mid:  "你感性而不失理智，能深情投入，也能适时抽身。情感在你这里是资产，不是包袱。",
+            desc_low:  "你处事更冷静，不容易被情绪左右。这让你高效，但有时会让身边的人感到距离。",
+            strengths: ["深度共情能力，让人感到被真正理解", "艺术感强，对美与意义有天然的感知", "忠诚而深情，是值得托付一生的伴侣"],
+            weaknesses: ["情绪容易被他人的状态牵引，容易内耗", "受伤后愈合慢，执念难以放下", "有时感性凌驾于判断，做出后悔的决定"],
+            modern: [
+                { icon: "💼", label: "职场", text: "在需要人文关怀的领域（教育、创作、服务）如鱼得水。纯理性的职场环境会让你窒息，要找到有人情味的土壤。" },
+                { icon: "💬", label: "社交", text: "圈子里最懂「照顾情绪」的人，但要当心成为所有人的情绪垃圾桶。你的感受同样重要。" },
+                { icon: "❤️", label: "亲密", text: "你给的爱是全部身家，对方感受得到。但请记住：爱一个人不等于失去自己。" }
+            ],
+            advice: "段誉的痴情令人动容，但真正的成长是在爱中保持自我。你的深情是宝，请先用来爱你自己。"
+        },
+        K: {
+            name: "狂", explain: "反叛/个性", mantra: "不入俗套，我自狂歌。",
+            detail: "高分者不屑规则。你敢于向一切平庸挑战，卓尔不群。",
+            desc_high: "你的狂性值极高——你天生对「应该」和「规定」过敏。你不是故意叛逆，而是真的看不惯那些限制想象力的框框。你最好的状态，是在无人管束的旷野里。",
+            desc_mid:  "你有独特性，但知道何时收放。你的与众不同是魅力，不是麻烦。",
+            desc_low:  "你更习惯在规则内找到空间，稳健而可靠。这是实力，不是平庸。",
+            strengths: ["创造力和突破性思维是你的核心竞争力", "不惧权威，敢说别人不敢说的话", "在混乱中反而能发现别人错过的机会"],
+            weaknesses: ["对单调和重复的容忍度极低，难以坚持", "有时「与众不同」成了目的本身，而非手段", "容易与强调秩序的环境产生摩擦"],
+            modern: [
+                { icon: "💼", label: "职场", text: "创业、创意、艺术是你的天地。传统企业的科层制度是你的天敌。找到允许你「出格」的平台，你会爆发惊人能量。" },
+                { icon: "💬", label: "社交", text: "你是派对的灵魂，但别让「酷」变成壁垒。真正的关系需要你有时脱下铠甲。" },
+                { icon: "❤️", label: "亲密", text: "你需要一个能给你空间又能拉住你的人。掌控欲强的伴侣会让你窒息。" }
+            ],
+            advice: "令狐冲的潇洒不是无所顾忌，而是在看透规则后选择自由。你的狂，要有根——才能飞得更高而不迷失。"
+        },
+        Y: {
+            name: "隐", explain: "出世/宁静", mantra: "采菊东篱，心远地偏。",
+            detail: "高分者追求内心平静。渴望归隐，是喧嚣世界的观望者。",
+            desc_high: "你的隐逸值极高——人群和喧嚣对你来说是消耗，而独处是充电。你有一个别人进不去的内心世界，那里比任何热闹都真实。",
+            desc_mid:  "你享受独处，但不拒绝连接。进退自如，是你最舒适的状态。",
+            desc_low:  "你从外部世界获取能量，享受热闹与参与。你的存在本身就是燃料。",
+            strengths: ["深度思考能力，能看见别人忽视的本质", "不被流行与噪音裹挟，有自己的判断体系", "是混乱中最冷静的那双眼睛"],
+            weaknesses: ["过度回避社交，可能错过重要机遇", "内心世界太丰富，有时难以被他人理解", "容易把「隐退」当成逃避现实的出口"],
+            modern: [
+                { icon: "💼", label: "职场", text: "适合深度工作：研究、写作、技术、战略。开放式办公室和高频会议是你的噩梦，争取远程或独立空间。" },
+                { icon: "💬", label: "社交", text: "朋友不多但极深。你不参与的八卦和聚会，往往是你在独自做最有价值的事。" },
+                { icon: "❤️", label: "亲密", text: "你需要一个懂得给你空间的人，而不是时刻需要陪伴的人。沉默对你来说是亲密，不是冷战。" }
+            ],
+            advice: "小龙女的出世并非冷漠，而是忠于内心的最高形式。你的安静是力量，不是缺陷——但记得偶尔出山，世界需要你这样的清醒者。"
+        }
     };
 
     const roles = [
         // 男侠 - 正派
-        { g:"M", name:"郭靖", img:"guojing.png", mate:"黄蓉", enemy:"欧阳锋", rarity:"江湖稀有度：1%（万中无一的纯粹大侠）", tag:"#侠之大者", scores:{X:55,M:15,Z:55,Q:30,K:10,Y:15} },
-        { g:"M", name:"乔峰", img:"qiaofeng.png", mate:"阿朱", enemy:"慕容复", rarity:"江湖稀有度：2%（悲剧英雄般的战神）", tag:"#义薄云天", scores:{X:55,M:25,Z:45,Q:35,K:25,Y:10} },
-        { g:"M", name:"令狐冲", img:"linghuchong.png", mate:"任盈盈", enemy:"岳不群", rarity:"江湖稀有度：5%（世间少有的自由灵魂）", tag:"#洒脱不羁", scores:{X:35,M:25,Z:15,Q:35,K:45,Y:45} },
-        { g:"M", name:"张无忌", img:"zhangwuji.png", mate:"赵敏", enemy:"成昆", rarity:"江湖稀有度：8%（宽厚温良的绝世高手）", tag:"#厚德载物", scores:{X:40,M:20,Z:25,Q:50,K:15,Y:30} },
-        { g:"M", name:"段誉", img:"duanyu.png", mate:"王语嫣", enemy:"鸠摩智", rarity:"江湖稀有度：6%（至情至性的痴情公子）", tag:"#至情至性", scores:{X:30,M:15,Z:20,Q:55,K:20,Y:40} },
-        { g:"M", name:"胡斐", img:"hufei.png", mate:"程灵素", enemy:"田归农", rarity:"江湖稀有度：10%（爱憎分明的热血刀客）", tag:"#爱憎分明", scores:{X:45,M:20,Z:35,Q:30,K:30,Y:15} },
-        { g:"M", name:"石破天", img:"shipotian.png", mate:"阿绣", enemy:"贝海石", rarity:"江湖稀有度：4%（返璞归真的赤子）", tag:"#大巧若拙", scores:{X:40,M:10,Z:45,Q:25,K:10,Y:50} },
-        { g:"M", name:"袁承志", img:"yuanchengzhi.png", mate:"温青青", enemy:"皇太极", rarity:"江湖稀有度：12%（端方持重的领袖才干）", tag:"#端方持重", scores:{X:45,M:30,Z:40,Q:30,K:15,Y:20} },
-        { g:"M", name:"陈家洛", img:"chenjialuo.png", mate:"香香公主", enemy:"乾隆", rarity:"江湖稀有度：15%（书生意气的理想主义者）", tag:"#书生意气", scores:{X:35,M:40,Z:30,Q:45,K:15,Y:15} },
-        { g:"M", name:"狄云", img:"diyun.png", mate:"水笙", enemy:"花铁干", rarity:"江湖稀有度：3%（在黑暗中涅槃的坚韧者）", tag:"#涅槃重生", scores:{X:35,M:15,Z:55,Q:40,K:10,Y:45} },
+        { g:"M", name:"郭靖", img:"guojing.png", mate:"黄蓉", enemy:"欧阳锋", rarity:"江湖稀有度：1%（万中无一的纯粹大侠）", tag:"#侠之大者", scores:{X:55,M:15,Z:55,Q:30,K:10,Y:15} , peer:"杨过", profile:"你像郭靖一样，是那种用一生践行信念的人。不聪明，但绝对可靠。你的力量来自根——来自你对某些东西死心塌地的忠诚。在这个什么都可以抛弃的时代，你的「不变」本身就是最稀缺的财富。"},
+        { g:"M", name:"乔峰", img:"qiaofeng.png", mate:"阿朱", enemy:"慕容复", rarity:"江湖稀有度：2%（悲剧英雄般的战神）", tag:"#义薄云天", scores:{X:55,M:25,Z:45,Q:35,K:25,Y:10} , peer:"郭靖", profile:"你的内心住着一个乔峰——强大到令人敬畏，却又脆弱到令人心疼。你对自己的要求比对任何人都严苛，你能扛住别人扛不住的重量，但那重量有时会把你压弯。记住：英雄也可以软弱。"},
+        { g:"M", name:"令狐冲", img:"linghuchong.png", mate:"任盈盈", enemy:"岳不群", rarity:"江湖稀有度：5%（世间少有的自由灵魂）", tag:"#洒脱不羁", scores:{X:35,M:25,Z:15,Q:35,K:45,Y:45} , peer:"韦小宝", profile:"你和令狐冲一样，骨子里是个自由主义者。你不是不能承担责任，只是讨厌被规则框死的感觉。你的快乐是真实的，你的笑声是真心的——在这个人人戴面具的时代，你的「真」是最难得的东西。"},
+        { g:"M", name:"张无忌", img:"zhangwuji.png", mate:"赵敏", enemy:"成昆", rarity:"江湖稀有度：8%（宽厚温良的绝世高手）", tag:"#厚德载物", scores:{X:40,M:20,Z:25,Q:50,K:15,Y:30} , peer:"段誉", profile:"你像张无忌，好到有点让人担心——担心这个世界配不上你的善良。你不擅长拒绝，不擅长算计，但你有一种特别的力量：你走过的地方，剑拔弩张会变成放下兵器。"},
+        { g:"M", name:"段誉", img:"duanyu.png", mate:"王语嫣", enemy:"鸠摩智", rarity:"江湖稀有度：6%（至情至性的痴情公子）", tag:"#至情至性", scores:{X:30,M:15,Z:20,Q:55,K:20,Y:40} , peer:"张无忌", profile:"你是个浪漫主义者，像段誉一样把世界看成一首诗。你对美有天然的感知，对情有近乎偏执的投入。生活对你来说不是要「赢」的游戏，而是要「活进去」的体验。"},
+        { g:"M", name:"胡斐", img:"hufei.png", mate:"程灵素", enemy:"田归农", rarity:"江湖稀有度：10%（爱憎分明的热血刀客）", tag:"#爱憎分明", scores:{X:45,M:20,Z:35,Q:30,K:30,Y:15} , peer:"乔峰", profile:"你有一种侠气，是那种「我不管规矩怎么说，这件事就是不对」的直觉正义感。你的爱憎分明有时让人觉得「太轴」，但真正了解你的人，都知道那是这个世界最需要的东西。"},
+        { g:"M", name:"石破天", img:"shipotian.png", mate:"阿绣", enemy:"贝海石", rarity:"江湖稀有度：4%（返璞归真的赤子）", tag:"#大巧若拙", scores:{X:40,M:10,Z:45,Q:25,K:10,Y:50} , peer:"虚竹", profile:"你有一种特别的纯粹，像石破天一样——不是因为简单，而是因为你从未被「应该怎样」污染过。你的直觉往往比别人的计算更准确，因为你没有杂念。"},
+        { g:"M", name:"袁承志", img:"yuanchengzhi.png", mate:"温青青", enemy:"皇太极", rarity:"江湖稀有度：12%（端方持重的领袖才干）", tag:"#端方持重", scores:{X:45,M:30,Z:40,Q:30,K:15,Y:20} , peer:"郭靖", profile:"你是那种扛得起大局的人。有责任感、有原则、有能力，是朋友圈里的「大哥」。你不需要成为最耀眼的那个，只需要做最可靠的那个——而你确实做到了。"},
+        { g:"M", name:"陈家洛", img:"chenjialuo.png", mate:"香香公主", enemy:"乾隆", rarity:"江湖稀有度：15%（书生意气的理想主义者）", tag:"#书生意气", scores:{X:35,M:40,Z:30,Q:45,K:15,Y:15} , peer:"令狐冲", profile:"你有才华、有理想，也有挥之不去的「如果当初」。你像陈家洛一样，在现实与梦想之间摇摆，但这份摇摆本身就是你的诗意。接受不完美的自己，才能释放全部的力量。"},
+        { g:"M", name:"狄云", img:"diyun.png", mate:"水笙", enemy:"花铁干", rarity:"江湖稀有度：3%（在黑暗中涅槃的坚韧者）", tag:"#涅槃重生", scores:{X:35,M:15,Z:55,Q:40,K:10,Y:45} , peer:"石破天", profile:"你经历过或正在经历某种深刻的幻灭——对人性、对规则、对曾经相信的东西。像狄云一样，你在灰烬里学会了什么是真实。这份历练让你比任何人都更懂珍惜真正的善意。"},
         // 男侠 - 反派
-        { g:"M", name:"欧阳锋", img:"ouyangfeng.png", mate:"武学巅峰", enemy:"洪七公", rarity:"江湖稀有度：2%（偏执到极致的武痴）", tag:"#逆流而上", scores:{X:10,M:45,Z:55,Q:15,K:50,Y:10} },
-        { g:"M", name:"岳不群", img:"yuebuqun.png", mate:"辟邪剑谱", enemy:"令狐冲", rarity:"江湖稀有度：3%（极致隐忍的布局者）", tag:"#隐忍布局", scores:{X:15,M:55,Z:50,Q:10,K:20,Y:10} },
-        { g:"M", name:"金轮法王", img:"jinlunfawang.png", mate:"好徒儿", enemy:"杨过", rarity:"江湖稀有度：5%（自负巅峰的宗师）", tag:"#自负巅峰", scores:{X:20,M:35,Z:50,Q:20,K:25,Y:15} },
-        { g:"M", name:"慕容复", img:"murongfu.png", mate:"大燕皇位", enemy:"段誉", rarity:"江湖稀有度：4%（背负宿命的囚徒）", tag:"#执念成狂", scores:{X:15,M:45,Z:55,Q:15,K:25,Y:5} },
-        { g:"M", name:"林平之", img:"linpingzhi.png", mate:"岳灵珊", enemy:"余沧海", rarity:"江湖稀有度：6%（被仇恨淬炼的孤狼）", tag:"#向死而生", scores:{X:15,M:35,Z:55,Q:20,K:45,Y:5} },
-        { g:"M", name:"成昆", img:"chengkun.png", mate:"灭明教", enemy:"谢逊", rarity:"江湖稀有度：1%（算无遗策的暗影）", tag:"#算无遗策", scores:{X:5,M:58,Z:50,Q:25,K:30,Y:10} },
-        { g:"M", name:"游坦之", img:"youtanzhi.png", mate:"阿紫", enemy:"乔峰", rarity:"江湖稀有度：2%（卑微到尘埃的痴恋者）", tag:"#爱到尘埃", scores:{X:10,M:15,Z:55,Q:58,K:20,Y:5} },
-        { g:"M", name:"左冷禅", img:"zuolengchan.png", mate:"五岳盟主", enemy:"任我行", rarity:"江湖稀有度：5%（权谋至上的铁腕枭雄）", tag:"#权谋至上", scores:{X:10,M:50,Z:45,Q:10,K:35,Y:10} },
-        { g:"M", name:"丁春秋", img:"dingchunqiu.png", mate:"逍遥派", enemy:"虚竹", rarity:"江湖稀有度：7%（唯我独尊的狂徒）", tag:"#唯我独尊", scores:{X:5,M:40,Z:30,Q:15,K:55,Y:10} },
-        { g:"M", name:"田归农", img:"tianguinong.png", mate:"宝藏", enemy:"苗人凤", rarity:"江湖稀有度：10%（见缝插针的精致利己者）", tag:"#见缝插针", scores:{X:10,M:50,Z:35,Q:20,K:25,Y:15} },
+        { g:"M", name:"欧阳锋", img:"ouyangfeng.png", mate:"武学巅峰", enemy:"洪七公", rarity:"江湖稀有度：2%（偏执到极致的武痴）", tag:"#逆流而上", scores:{X:10,M:45,Z:55,Q:15,K:50,Y:10} , peer:"慕容复", profile:"你有一种极端的专注，像欧阳锋一样，把一件事推到极致。这种偏执在旁人看来可能已经越界，但对你来说，那是唯一让你感觉活着的方式。方向比力量更重要——这是你最需要听的话。"},
+        { g:"M", name:"岳不群", img:"yuebuqun.png", mate:"辟邪剑谱", enemy:"令狐冲", rarity:"江湖稀有度：3%（极致隐忍的布局者）", tag:"#隐忍布局", scores:{X:15,M:55,Z:50,Q:10,K:20,Y:10} , peer:"成昆", profile:"你有极强的自我管理能力和长远布局的智慧。但你内心深处有一个问题要回答：你的努力，究竟是为了什么？为了「成为」，还是为了「证明」？两者的结局，截然不同。"},
+        { g:"M", name:"金轮法王", img:"jinlunfawang.png", mate:"好徒儿", enemy:"杨过", rarity:"江湖稀有度：5%（自负巅峰的宗师）", tag:"#自负巅峰", scores:{X:20,M:35,Z:50,Q:20,K:25,Y:15} , peer:"左冷禅", profile:"你有宗师气质——眼界高、标准高、容错率低。你对平庸有天然的鄙视，对卓越有近乎信仰的追求。唯一的功课，是允许别人按自己的速度成长。"},
+        { g:"M", name:"慕容复", img:"murongfu.png", mate:"大燕皇位", enemy:"段誉", rarity:"江湖稀有度：4%（背负宿命的囚徒）", tag:"#执念成狂", scores:{X:15,M:45,Z:55,Q:15,K:25,Y:5} , peer:"岳不群", profile:"你背负着某种「使命」——来自家族、来自期待、来自你自己设定的宏大目标。像慕容复一样，这份重量有时会让你忘记：你是一个人，不只是一个计划。"},
+        { g:"M", name:"林平之", img:"linpingzhi.png", mate:"岳灵珊", enemy:"余沧海", rarity:"江湖稀有度：6%（被仇恨淬炼的孤狼）", tag:"#向死而生", scores:{X:15,M:35,Z:55,Q:20,K:45,Y:5} , peer:"狄云", profile:"你懂得隐忍，懂得等待，懂得把痛苦转化为力量。这是本事，但要小心——当仇恨成为唯一的燃料，它最终会烧掉你自己。找一个值得追求的未来，比一个值得报复的过去，更有力量。"},
+        { g:"M", name:"成昆", img:"chengkun.png", mate:"灭明教", enemy:"谢逊", rarity:"江湖稀有度：1%（算无遗策的暗影）", tag:"#算无遗策", scores:{X:5,M:58,Z:50,Q:25,K:30,Y:10} , peer:"岳不群", profile:"你的智识能力是顶级的，洞察力、布局感、执行力，几乎无懈可击。但这一切最终服务于什么？这是你需要认真回答的问题——因为工具越锋利，方向越重要。"},
+        { g:"M", name:"游坦之", img:"youtanzhi.png", mate:"阿紫", enemy:"乔峰", rarity:"江湖稀有度：2%（卑微到尘埃的痴恋者）", tag:"#爱到尘埃", scores:{X:10,M:15,Z:55,Q:58,K:20,Y:5} , peer:"狄云", profile:"你有一种极深的情感依恋——对某个人、某段关系、某种被需要的感觉。这份深情是你的本质，也是你的困境。真正的爱，应该让你更完整，而不是更渺小。"},
+        { g:"M", name:"左冷禅", img:"zuolengchan.png", mate:"五岳盟主", enemy:"任我行", rarity:"江湖稀有度：5%（权谋至上的铁腕枭雄）", tag:"#权谋至上", scores:{X:10,M:50,Z:45,Q:10,K:35,Y:10} , peer:"岳不群", profile:"你是个实用主义者，对权力和秩序有清醒的认知。你明白「规则」是可以被重写的，而你有能力重写它。唯一需要确认的是：你建立的新秩序，能让更多人活得更好吗？"},
+        { g:"M", name:"丁春秋", img:"dingchunqiu.png", mate:"逍遥派", enemy:"虚竹", rarity:"江湖稀有度：7%（唯我独尊的狂徒）", tag:"#唯我独尊", scores:{X:5,M:40,Z:30,Q:15,K:55,Y:10} , peer:"欧阳锋", profile:"你我行我素到了极致——不在意评价，不在乎规则，只活在自己的逻辑里。这种彻底的「自我」，在极端时是危险的，但其中有一个内核是真实的：你从不伪装。"},
+        { g:"M", name:"田归农", img:"tianguinong.png", mate:"宝藏", enemy:"苗人凤", rarity:"江湖稀有度：10%（见缝插针的精致利己者）", tag:"#见缝插针", scores:{X:10,M:50,Z:35,Q:20,K:25,Y:15} , peer:"韦小宝", profile:"你对机会极度敏感，知道如何在缝隙中生存和获益。这是适应力，也是生存智慧。但长期生活在算计里，容易忘记什么是真正想要的。"},
         // 男侠 - 奇人
-        { g:"M", name:"周伯通", img:"zhoubotong.png", mate:"瑛姑", enemy:"无聊", rarity:"江湖稀有度：1%（天真烂漫的顽童）", tag:"#天真烂漫", scores:{X:30,M:10,Z:20,Q:25,K:55,Y:50} },
-        { g:"M", name:"韦小宝", img:"weixiaobao.png", mate:"双儿", enemy:"苦差事", rarity:"江湖稀有度：2%（左右逢源的混世锦鲤）", tag:"#左右逢源", scores:{X:25,M:58,Z:15,Q:40,K:50,Y:20} },
-        { g:"M", name:"田伯光", img:"tianbiguang.png", mate:"令狐冲", enemy:"规矩", rarity:"江湖稀有度：8%（不落俗套的快活浪子）", tag:"#不落俗套", scores:{X:30,M:25,Z:20,Q:35,K:55,Y:25} },
-        { g:"M", name:"谢逊", img:"xiexun.png", mate:"张翠山", enemy:"成昆", rarity:"江湖稀有度：4%（狂暴而深邃的智者）", tag:"#金毛狮王", scores:{X:35,M:40,Z:45,Q:45,K:50,Y:15} },
-        { g:"M", name:"南海鳄神", img:"nanhaieshen.png", mate:"师父段誉", enemy:"规矩", rarity:"江湖稀有度：6%（言出必行的憨侠）", tag:"#言出必行", scores:{X:35,M:5,Z:40,Q:20,K:45,Y:15} },
-        { g:"M", name:"桃根仙", img:"taogenxian.png", mate:"五仙兄弟", enemy:"逻辑", rarity:"江湖稀有度：5%（思维跳脱的鬼才）", tag:"#胡搅蛮缠", scores:{X:25,M:35,Z:15,Q:20,K:55,Y:10} },
-        { g:"M", name:"祖千秋", img:"zuqianqiu.png", mate:"老不死", enemy:"没酒", rarity:"江湖稀有度：12%（雅癖古怪的奇人）", tag:"#饮酒专家", scores:{X:20,M:45,Z:30,Q:25,K:40,Y:25} },
-        { g:"M", name:"柯镇恶", img:"kezhenee.png", mate:"兄弟姐妹", enemy:"全天下恶人", rarity:"江湖稀有度：3%（一生不服的硬颈杠精）", tag:"#一生不服", scores:{X:55,M:5,Z:58,Q:25,K:45,Y:5} },
-        { g:"M", name:"虚竹", img:"xuzhu.png", mate:"梦姑", enemy:"破戒", rarity:"江湖稀有度：7%（随缘随性的佛系锦鲤）", tag:"#随缘随性", scores:{X:35,M:10,Z:40,Q:30,K:10,Y:55} },
-        { g:"M", name:"茅十八", img:"maoshiba.png", mate:"韦小宝", enemy:"官府", rarity:"江湖稀有度：15%（豪气干云的草莽英雄）", tag:"#豪气干云", scores:{X:50,M:10,Z:35,Q:25,K:35,Y:10} },
+        { g:"M", name:"周伯通", img:"zhoubotong.png", mate:"瑛姑", enemy:"无聊", rarity:"江湖稀有度：1%（天真烂漫的顽童）", tag:"#天真烂漫", scores:{X:30,M:10,Z:20,Q:25,K:55,Y:50} , peer:"令狐冲", profile:"你是难得的真性情——不装、不累、不在乎别人怎么看。你的快乐是自给自足的，这在这个时代极其罕见。唯一要注意的，是别让「自在」变成对周围人的漠视。"},
+        { g:"M", name:"韦小宝", img:"weixiaobao.png", mate:"双儿", enemy:"苦差事", rarity:"江湖稀有度：2%（左右逢源的混世锦鲤）", tag:"#左右逢源", scores:{X:25,M:58,Z:15,Q:40,K:50,Y:20} , peer:"令狐冲", profile:"你有一种独特的生存天才——在任何场合都能找到立足点，在任何关系里都能留下善意。这不是油滑，是人性的深刻理解。只是偶尔，试着为一件事认真一次，你会发现另一种力量。"},
+        { g:"M", name:"田伯光", img:"tianbiguang.png", mate:"令狐冲", enemy:"规矩", rarity:"江湖稀有度：8%（不落俗套的快活浪子）", tag:"#不落俗套", scores:{X:30,M:25,Z:20,Q:35,K:55,Y:25} , peer:"周伯通", profile:"你活得很真实，欲望不遮掩，个性不收敛。这种直接在这个时代反而是稀缺品。你需要的不是改变本性，而是找到一个值得为之升华的方向。"},
+        { g:"M", name:"谢逊", img:"xiexun.png", mate:"张翠山", enemy:"成昆", rarity:"江湖稀有度：4%（狂暴而深邃的智者）", tag:"#金毛狮王", scores:{X:35,M:40,Z:45,Q:45,K:50,Y:15} , peer:"乔峰", profile:"你有狂放的外壳，藏着极深的情感。你爱得深，恨得也深，两者都是同一种力量的不同面向。当你找到值得守护的东西，这份力量会让你成为传奇。"},
+        { g:"M", name:"南海鳄神", img:"nanhaieshen.png", mate:"师父段誉", enemy:"规矩", rarity:"江湖稀有度：6%（言出必行的憨侠）", tag:"#言出必行", scores:{X:35,M:5,Z:40,Q:20,K:45,Y:15} , peer:"茅十八", profile:"你是言出必行的人，在这个承诺廉价的时代，你的「一口唾沫一个钉」是真正的稀缺品。你的单纯是武器，不是弱点。"},
+        { g:"M", name:"桃根仙", img:"taogenxian.png", mate:"五仙兄弟", enemy:"逻辑", rarity:"江湖稀有度：5%（思维跳脱的鬼才）", tag:"#胡搅蛮缠", scores:{X:25,M:35,Z:15,Q:20,K:55,Y:10} , peer:"周伯通", profile:"你的思维跳跃方式让大多数人跟不上，但这恰恰说明你看到了他们没有看到的东西。不要因为别人不理解就否定自己的角度——你只是在用不同的频率运转。"},
+        { g:"M", name:"祖千秋", img:"zuqianqiu.png", mate:"老不死", enemy:"没酒", rarity:"江湖稀有度：12%（雅癖古怪的奇人）", tag:"#饮酒专家", scores:{X:20,M:45,Z:30,Q:25,K:40,Y:25} , peer:"田伯光", profile:"你对自己热爱的事物有近乎偏执的标准，不将就，不凑合。这种「雅」是一种坚持，也是一种骄傲。只是记得：有些值得的人，值得你降低一点门槛。"},
+        { g:"M", name:"柯镇恶", img:"kezhenee.png", mate:"兄弟姐妹", enemy:"全天下恶人", rarity:"江湖稀有度：3%（一生不服的硬颈杠精）", tag:"#一生不服", scores:{X:55,M:5,Z:58,Q:25,K:45,Y:5} , peer:"郭靖", profile:"你有一种「一口气到底」的劲儿——认准的事不回头，认定的人不放弃，认清的敌人不和解。这股子轴劲儿让你付出过代价，但也让你从未失去自己。"},
+        { g:"M", name:"虚竹", img:"xuzhu.png", mate:"梦姑", enemy:"破戒", rarity:"江湖稀有度：7%（随缘随性的佛系锦鲤）", tag:"#随缘随性", scores:{X:35,M:10,Z:40,Q:30,K:10,Y:55} , peer:"石破天", profile:"好运气背后，是你内心的善良和纯粹在替你铺路。你不擅长主动争取，但你擅长接住那些意外落在你身上的礼物。继续做你自己——有时候，无为胜有为。"},
+        { g:"M", name:"茅十八", img:"maoshiba.png", mate:"韦小宝", enemy:"官府", rarity:"江湖稀有度：15%（豪气干云的草莽英雄）", tag:"#豪气干云", scores:{X:50,M:10,Z:35,Q:25,K:35,Y:10} , peer:"胡斐", profile:"你是那种「我就是看不过去」的人——情绪来得快，行动来得更快。你的热血是真实的，你的义气是货真价实的。只是火大的时候，记得先想清楚再出剑。"},
         // 女侠 - 正派
-        { g:"F", name:"黄蓉", img:"huangrong.png", mate:"郭靖", enemy:"欧阳锋", rarity:"江湖稀有度：2%（灵动剔透的玲珑心）", tag:"#智计百出", scores:{X:35,M:58,Z:30,Q:45,K:35,Y:20} },
-        { g:"F", name:"小龙女", img:"xiaolongnv.png", mate:"杨过", enemy:"尘世", rarity:"江湖稀有度：1%（至纯至净的古墓幽兰）", tag:"#至纯至净", scores:{X:25,M:15,Z:55,Q:50,K:25,Y:58} },
-        { g:"F", name:"任盈盈", img:"renyingying.png", mate:"令狐冲", enemy:"孤独", rarity:"江湖稀有度：5%（从容大度的圣姑雅量）", tag:"#从容大度", scores:{X:35,M:50,Z:40,Q:45,K:20,Y:40} },
-        { g:"F", name:"程灵素", img:"chenglingsu.png", mate:"胡斐", enemy:"自卑", rarity:"江湖稀有度：3%（深情无悔的蕙质兰心）", tag:"#深情无悔", scores:{X:45,M:55,Z:45,Q:50,K:15,Y:30} },
-        { g:"F", name:"郭襄", img:"guoxiang.png", mate:"杨过", enemy:"平庸", rarity:"江湖稀有度：4%（不改初心的灿烂火花）", tag:"#豪爽可爱", scores:{X:45,M:25,Z:20,Q:50,K:50,Y:35} },
-        { g:"F", name:"阿朱", img:"azhu.png", mate:"乔峰", enemy:"宿命", rarity:"江湖稀有度：6%（温柔体贴的解语灵花）", tag:"#温柔体贴", scores:{X:40,M:45,Z:30,Q:58,K:25,Y:20} },
-        { g:"F", name:"王语嫣", img:"wangyuyan.png", mate:"段誉", enemy:"虚情假意", rarity:"江湖稀有度：10%（博学多才的武学字典）", tag:"#博学多才", scores:{X:15,M:55,Z:35,Q:45,K:10,Y:30} },
-        { g:"F", name:"双儿", img:"shuange.png", mate:"韦小宝", enemy:"分离", rarity:"江湖稀有度：12%（纯善忠诚的完美伴侣）", tag:"#纯善忠诚", scores:{X:35,M:15,Z:50,Q:55,K:10,Y:25} },
-        { g:"F", name:"穆念慈", img:"munianci.png", mate:"杨康", enemy:"动摇", rarity:"江湖稀有度：8%（坚贞执着的如一初心）", tag:"#从一而终", scores:{X:30,M:10,Z:58,Q:55,K:15,Y:20} },
-        { g:"F", name:"仪琳", img:"yilin.png", mate:"令狐冲", enemy:"心魔", rarity:"江湖稀有度：9%（如水温柔的圣洁慈悲）", tag:"#如水温柔", scores:{X:35,M:5,Z:45,Q:50,K:10,Y:55} },
+        { g:"F", name:"黄蓉", img:"huangrong.png", mate:"郭靖", enemy:"欧阳锋", rarity:"江湖稀有度：2%（灵动剔透的玲珑心）", tag:"#智计百出", scores:{X:35,M:58,Z:30,Q:45,K:35,Y:20} , peer:"赵敏", profile:"你有一种令人心悦诚服的聪明——不是那种冷冰冰的智力展示，而是带着温度的洞察。你在任何场合都能找到最佳解法，而且让人感觉不到被算计。这是最高级的智慧。"},
+        { g:"F", name:"小龙女", img:"xiaolongnv.png", mate:"杨过", enemy:"尘世", rarity:"江湖稀有度：1%（至纯至净的古墓幽兰）", tag:"#至纯至净", scores:{X:25,M:15,Z:55,Q:50,K:25,Y:58} , peer:"仪琳", profile:"你有一种不属于这个时代的纯粹——不是因为幼稚，而是因为你没有被世俗的期待改造。你的淡然是修炼，不是冷漠。在一个喧嚣的世界里，你的平静本身就是力量。"},
+        { g:"F", name:"任盈盈", img:"renyingying.png", mate:"令狐冲", enemy:"孤独", rarity:"江湖稀有度：5%（从容大度的圣姑雅量）", tag:"#从容大度", scores:{X:35,M:50,Z:40,Q:45,K:20,Y:40} , peer:"黄蓉", profile:"你有很强的掌控力，但你懂得把它收起来。你能看穿局势，但选择用温柔而非锋芒来影响它。这种从容来自内心的笃定，不是每个人都能练就。"},
+        { g:"F", name:"程灵素", img:"chenglingsu.png", mate:"胡斐", enemy:"自卑", rarity:"江湖稀有度：3%（深情无悔的蕙质兰心）", tag:"#深情无悔", scores:{X:45,M:55,Z:45,Q:50,K:15,Y:30} , peer:"黄蓉", profile:"你的付出是静默的，你的聪明是克制的，你的深情是不求回报的。像程灵素一样，你把最好的都给了别人，但请记得：你自己也值得被这样对待。"},
+        { g:"F", name:"郭襄", img:"guoxiang.png", mate:"杨过", enemy:"平庸", rarity:"江湖稀有度：4%（不改初心的灿烂火花）", tag:"#豪爽可爱", scores:{X:45,M:25,Z:20,Q:50,K:50,Y:35} , peer:"任盈盈", profile:"你有一种明亮的能量，走进哪里都能感染到人。你的侠气不是沉重的使命感，而是一种「看见了就要做点什么」的本能。保持这份燃烧，但也记得给自己留一点温存。"},
+        { g:"F", name:"阿朱", img:"azhu.png", mate:"乔峰", enemy:"宿命", rarity:"江湖稀有度：6%（温柔体贴的解语灵花）", tag:"#温柔体贴", scores:{X:40,M:45,Z:30,Q:58,K:25,Y:20} , peer:"双儿", profile:"你的感情是整颗心的投入，不做保留，不留退路。像阿朱一样，你爱的时候是全部。这份深情让人动容，也让你容易受伤——选择值得的人，是你最重要的功课。"},
+        { g:"F", name:"王语嫣", img:"wangyuyan.png", mate:"段誉", enemy:"虚情假意", rarity:"江湖稀有度：10%（博学多才的武学字典）", tag:"#博学多才", scores:{X:15,M:55,Z:35,Q:45,K:10,Y:30} , peer:"程灵素", profile:"你的知识体系是独特的，你观察世界的方式也与众不同。你懂得很多，但有时候会用「博学」来回避真实的情感接触。偶尔放下那本无形的「武功秘籍」，用心去感受，而不是分析。"},
+        { g:"F", name:"双儿", img:"shuange.png", mate:"韦小宝", enemy:"分离", rarity:"江湖稀有度：12%（纯善忠诚的完美伴侣）", tag:"#纯善忠诚", scores:{X:35,M:15,Z:50,Q:55,K:10,Y:25} , peer:"阿朱", profile:"你的忠诚和纯善是天然的，不是刻意培养的品质。你懂得如何让身边的人感到被照顾、被支持。只是请记得：照顾自己，和照顾别人同等重要。"},
+        { g:"F", name:"穆念慈", img:"munianci.png", mate:"杨康", enemy:"动摇", rarity:"江湖稀有度：8%（坚贞执着的如一初心）", tag:"#从一而终", scores:{X:30,M:10,Z:58,Q:55,K:15,Y:20} , peer:"阿朱", profile:"你的坚定令人敬佩——认准了就是认准了，哪怕全世界告诉你不对。这份执着有时是悲剧的来源，但也是你区别于普通人的核心。你的忠贞值得被一个真正值得的人看见。"},
+        { g:"F", name:"仪琳", img:"yilin.png", mate:"令狐冲", enemy:"心魔", rarity:"江湖稀有度：9%（如水温柔的圣洁慈悲）", tag:"#如水温柔", scores:{X:35,M:5,Z:45,Q:50,K:10,Y:55} , peer:"小龙女", profile:"你的善意是发自本能的，你的慈悲是不需要理由的。像仪琳一样，你会在所有人都在看热闹的时候，第一个想着「能帮上什么忙」。这份心，是这个世界的珍宝。"},
         // 女侠 - 反派
-        { g:"F", name:"李莫愁", img:"limochou.png", mate:"陆展元", enemy:"何沅君", rarity:"江湖稀有度：3%（偏执疯狂的赤练情魔）", tag:"#问世间情为何物", scores:{X:15,M:35,Z:50,Q:58,K:50,Y:10} },
-        { g:"F", name:"梅超风", img:"meichaofeng.png", mate:"陈玄风", enemy:"江南七怪", rarity:"江湖稀有度：4%（孤独复仇的暗黑之光）", tag:"#孤独复仇", scores:{X:20,M:25,Z:55,Q:45,K:50,Y:15} },
-        { g:"F", name:"周芷若", img:"zhouzhiruo.png", mate:"张无忌", enemy:"赵敏", rarity:"江湖稀有度：5%（事业至上的黑化掌门）", tag:"#事业至上", scores:{X:25,M:50,Z:55,Q:40,K:35,Y:15} },
-        { g:"F", name:"康敏", img:"kangmin.png", mate:"美貌", enemy:"忽视她的人", rarity:"江湖稀有度：2%（极致危险的致命毒花）", tag:"#偏执疯狂", scores:{X:5,M:55,Z:45,Q:35,K:50,Y:5} },
-        { g:"F", name:"灭绝师太", img:"miejueshitai.png", mate:"峨眉声誉", enemy:"明教", rarity:"江湖稀有度：6%（铁腕偏执的唯我独尊者）", tag:"#唯我独尊", scores:{X:45,M:20,Z:58,Q:10,K:45,Y:5} },
-        { g:"F", name:"叶二娘", img:"yeerniang.png", mate:"虚竹", enemy:"玄慈", rarity:"江湖稀有度：8%（忆子成狂的悲情邪徒）", tag:"#忆子成狂", scores:{X:20,M:25,Z:40,Q:55,K:35,Y:15} },
-        { g:"F", name:"何铁手", img:"hetieshou.png", mate:"袁承志", enemy:"教务", rarity:"江湖稀有度：7%（亦正亦邪的娇媚妖女）", tag:"#亦正亦邪", scores:{X:25,M:45,Z:30,Q:35,K:55,Y:25} },
-        { g:"F", name:"裘千尺", img:"qiuqianchi.png", mate:"公孙止", enemy:"负心汉", rarity:"江湖稀有度：4%（恨之入骨的幽冥怨灵）", tag:"#恨之入骨", scores:{X:15,M:50,Z:55,Q:25,K:45,Y:5} },
-        { g:"F", name:"班淑娴", img:"banshuxian.png", mate:"何太冲", enemy:"小妾", rarity:"江湖稀有度：10%（掌控全局的悍妒名媛）", tag:"#掌控全局", scores:{X:20,M:40,Z:45,Q:20,K:40,Y:15} },
-        { g:"F", name:"毛东珠", img:"maodongzhu.png", mate:"瘦头陀", enemy:"假身份被识破", rarity:"江湖稀有度：12%（深不可测的暗影特工）", tag:"#深不可测", scores:{X:15,M:55,Z:40,Q:30,K:35,Y:15} },
+        { g:"F", name:"李莫愁", img:"limochou.png", mate:"陆展元", enemy:"何沅君", rarity:"江湖稀有度：3%（偏执疯狂的赤练情魔）", tag:"#问世间情为何物", scores:{X:15,M:35,Z:50,Q:58,K:50,Y:10} , peer:"梅超风", profile:"你的感情系统是高功率运转的，爱起来是全部，恨起来也是全部。像李莫愁一样，你把自己烧成了一把剑——锋利而孤独。但那句「问世间情为何物」，真正懂的人，都曾经历过你所经历的。"},
+        { g:"F", name:"梅超风", img:"meichaofeng.png", mate:"陈玄风", enemy:"江南七怪", rarity:"江湖稀有度：4%（孤独复仇的暗黑之光）", tag:"#孤独复仇", scores:{X:20,M:25,Z:55,Q:45,K:50,Y:15} , peer:"李莫愁", profile:"你有一种孤绝的力量，在黑暗中独自燃烧。你的执念给了你力量，也让你与世界隔离。如果当年有人真正看见你——不是你的功夫，而是你这个人——或许一切都会不同。"},
+        { g:"F", name:"周芷若", img:"zhouzhiruo.png", mate:"张无忌", enemy:"赵敏", rarity:"江湖稀有度：5%（事业至上的黑化掌门）", tag:"#事业至上", scores:{X:25,M:50,Z:55,Q:40,K:35,Y:15} , peer:"赵敏", profile:"你是那种能为了目标重塑自己的人。你的变化不是背叛，而是一种极强的适应性和意志力。你最怕的，是失去自己辛苦建立的一切。但记住：真正属于你的，从来不会被夺走。"},
+        { g:"F", name:"康敏", img:"kangmin.png", mate:"美貌", enemy:"忽视她的人", rarity:"江湖稀有度：2%（极致危险的致命毒花）", tag:"#偏执疯狂", scores:{X:5,M:55,Z:45,Q:35,K:50,Y:5} , peer:"周芷若", profile:"你对「被看见」有极深的渴望，而这渴望被伤害扭曲成了另一种形态。你并不坏，你只是太受伤了。那个愤怒背后，有一个只想被好好对待的人。"},
+        { g:"F", name:"灭绝师太", img:"miejueshitai.png", mate:"峨眉声誉", enemy:"明教", rarity:"江湖稀有度：6%（铁腕偏执的唯我独尊者）", tag:"#唯我独尊", scores:{X:45,M:20,Z:58,Q:10,K:45,Y:5} , peer:"左冷禅", profile:"你有强烈的秩序感和使命感，知道自己要守护什么。问题是，当手段开始伤害你本该守护的人时——你能察觉吗？最好的领导者，是那些能看见自己盲区的人。"},
+        { g:"F", name:"叶二娘", img:"yeerniang.png", mate:"虚竹", enemy:"玄慈", rarity:"江湖稀有度：8%（忆子成狂的悲情邪徒）", tag:"#忆子成狂", scores:{X:20,M:25,Z:40,Q:55,K:35,Y:15} , peer:"李莫愁", profile:"你身上有一种深入骨髓的痛——那种失去后再也无法被填满的空洞。像叶二娘一样，你用扭曲的方式填补它。但那个洞，需要的是真实的连接，而不是替代品。"},
+        { g:"F", name:"何铁手", img:"hetieshou.png", mate:"袁承志", enemy:"教务", rarity:"江湖稀有度：7%（亦正亦邪的娇媚妖女）", tag:"#亦正亦邪", scores:{X:25,M:45,Z:30,Q:35,K:55,Y:25} , peer:"赵敏", profile:"你是复杂的，你的内心有不同方向的力量在拉锯。你可以「正」，也可以「邪」，这不是缺陷，是你拥有更丰富可能性的证明。选择让你真正自在的那个方向，而不是别人期待的那个。"},
+        { g:"F", name:"裘千尺", img:"qiuqianchi.png", mate:"公孙止", enemy:"负心汉", rarity:"江湖稀有度：4%（恨之入骨的幽冥怨灵）", tag:"#恨之入骨", scores:{X:15,M:50,Z:55,Q:25,K:45,Y:5} , peer:"李莫愁", profile:"你的愤怒是有来源的，你的偏执背后是真实的伤。像裘千尺一样，你在痛苦中发展出了一套让自己活下去的逻辑。但当那个逻辑开始伤害你自己时，是时候重写它了。"},
+        { g:"F", name:"班淑娴", img:"banshuxian.png", mate:"何太冲", enemy:"小妾", rarity:"江湖稀有度：10%（掌控全局的悍妒名媛）", tag:"#掌控全局", scores:{X:20,M:40,Z:45,Q:20,K:40,Y:15} , peer:"任盈盈", profile:"你对「控制」有近乎本能的需求，这背后是一种深层的不安全感。你不是真的想压制别人，你只是太害怕失控。试着放开一些——你会发现，真正值得留下的东西，不需要被抓紧。"},
+        { g:"F", name:"毛东珠", img:"maodongzhu.png", mate:"瘦头陀", enemy:"假身份被识破", rarity:"江湖稀有度：12%（深不可测的暗影特工）", tag:"#深不可测", scores:{X:15,M:55,Z:40,Q:30,K:35,Y:15} , peer:"韦小宝", profile:"你有极强的角色扮演能力和适应性，能在不同的场合和身份间灵活切换。这是一种罕见的才能。只是在所有面具之下，记得保留一个真实的自己——那才是你最后的根基。"},
         // 女侠 - 奇人
-        { g:"F", name:"蓝凤凰", img:"lanfenghuang.png", mate:"令狐冲", enemy:"名门正派", rarity:"江湖稀有度：5%（率性而为的异域娇娃）", tag:"#率性而为", scores:{X:35,M:35,Z:25,Q:30,K:55,Y:25} },
-        { g:"F", name:"阿紫", img:"azi.png", mate:"乔峰", enemy:"游坦之", rarity:"江湖稀有度：3%（妖娇诡谲的顽劣火花）", tag:"#妖娇诡谲", scores:{X:15,M:45,Z:35,Q:50,K:55,Y:10} },
-        { g:"F", name:"天山童姥", img:"tianshantonglao.png", mate:"虚竹", enemy:"李秋水", rarity:"江湖稀有度：2%（硬核霸道的唯我独尊者）", tag:"#唯我独尊", scores:{X:25,M:40,Z:55,Q:30,K:58,Y:30} },
-        { g:"F", name:"赵敏", img:"zhaomin.png", mate:"张无忌", enemy:"周芷若", rarity:"江湖稀有度：4%（巾帼不让须眉的百变郡主）", tag:"#巾帼统帅", scores:{X:30,M:58,Z:40,Q:50,K:55,Y:15} },
-        { g:"F", name:"瑛姑", img:"yinggu.png", mate:"周伯通", enemy:"段智兴", rarity:"江湖稀有度：7%（爱恨交织的痴心奇人）", tag:"#爱恨交织", scores:{X:20,M:55,Z:55,Q:55,K:45,Y:20} },
-        { g:"F", name:"钟灵", img:"zhongling.png", mate:"段誉", enemy:"寂寞", rarity:"江湖稀有度：12%（娇俏可人的活泼甜心）", tag:"#娇俏可人", scores:{X:30,M:20,Z:20,Q:45,K:35,Y:40} },
-        { g:"F", name:"木婉清", img:"muwanqing.png", mate:"段誉", enemy:"俗世偏见", rarity:"江湖稀有度：6%（野性带刺的傲骨玫瑰）", tag:"#傲骨侠肠", scores:{X:35,M:15,Z:40,Q:55,K:50,Y:30} },
-        { g:"F", name:"建宁公主", img:"jianninggongzhu.png", mate:"韦小宝", enemy:"规矩", rarity:"江湖稀有度：5%（古灵精怪的抖M狂后）", tag:"#古灵精怪", scores:{X:15,M:20,Z:30,Q:45,K:58,Y:10} },
-        { g:"F", name:"史红石", img:"shihongshi.png", mate:"黄蓉", enemy:"陈友谅", rarity:"江湖稀有度：15%（初生牛犊的幼年帮主）", tag:"#初生牛犊", scores:{X:45,M:20,Z:35,Q:30,K:35,Y:15} },
-        { g:"F", name:"傻姑", img:"shagu.png", mate:"黄药师", enemy:"坏人", rarity:"江湖稀有度：8%（大智若愚的无邪真相）", tag:"#大智若愚", scores:{X:30,M:5,Z:25,Q:20,K:40,Y:55} }
+        { g:"F", name:"蓝凤凰", img:"lanfenghuang.png", mate:"令狐冲", enemy:"名门正派", rarity:"江湖稀有度：5%（率性而为的异域娇娃）", tag:"#率性而为", scores:{X:35,M:35,Z:25,Q:30,K:55,Y:25} , peer:"郭襄", profile:"你有一种异域的自由气息——不被主流的规则约束，走的是自己的路。你的率性是天然的，不是表演出来的。这份真实让你魅力四射，也让真正的同类向你靠拢。"},
+        { g:"F", name:"阿紫", img:"azi.png", mate:"乔峰", enemy:"游坦之", rarity:"江湖稀有度：3%（妖娇诡谲的顽劣火花）", tag:"#妖娇诡谲", scores:{X:15,M:45,Z:35,Q:50,K:55,Y:10} , peer:"建宁公主", profile:"你对世界有一种孩子气的占有欲——我要的我就要，我不要的给了我也不珍惜。这是一种极端的真实。你需要的不是改变这份本能，而是找到一个真正值得你执着的对象。"},
+        { g:"F", name:"天山童姥", img:"tianshantonglao.png", mate:"虚竹", enemy:"李秋水", rarity:"江湖稀有度：2%（硬核霸道的唯我独尊者）", tag:"#唯我独尊", scores:{X:25,M:40,Z:55,Q:30,K:58,Y:30} , peer:"灭绝师太", profile:"你有一种不容置疑的气场，走进哪里都是主角。你对「服从」有近乎天然的期待，对「挑战」有本能的反弹。学着允许别人有时候是对的——不会减损你半点威严。"},
+        { g:"F", name:"赵敏", img:"zhaomin.png", mate:"张无忌", enemy:"周芷若", rarity:"江湖稀有度：4%（巾帼不让须眉的百变郡主）", tag:"#巾帼统帅", scores:{X:30,M:58,Z:40,Q:50,K:55,Y:15} , peer:"黄蓉", profile:"你是那种「我偏要做到」的人。越有人说不可能，你越要证明可能。你的执念不是弱点，是核心动力。唯一的风险是：当「赢」变成目的本身，你可能忘了自己最初为什么出发。"},
+        { g:"F", name:"瑛姑", img:"yinggu.png", mate:"周伯通", enemy:"段智兴", rarity:"江湖稀有度：7%（爱恨交织的痴心奇人）", tag:"#爱恨交织", scores:{X:20,M:55,Z:55,Q:55,K:45,Y:20} , peer:"李莫愁", profile:"你的人生被一场深刻的爱与背叛重新定义，从此你的所有选择都带着那个底色。像瑛姑一样，你在爱与恨之间困了太久。是时候允许自己从那一刻离开，活进当下了。"},
+        { g:"F", name:"钟灵", img:"zhongling.png", mate:"段誉", enemy:"寂寞", rarity:"江湖稀有度：12%（娇俏可人的活泼甜心）", tag:"#娇俏可人", scores:{X:30,M:20,Z:20,Q:45,K:35,Y:40} , peer:"郭襄", profile:"你有一种天然的亲切感，走到哪里都能让人感到轻松。你的活泼不是表演，是真实的快乐。在这个人人都在用力「经营」自己的时代，你的自然是一股清流。"},
+        { g:"F", name:"木婉清", img:"muwanqing.png", mate:"段誉", enemy:"俗世偏见", rarity:"江湖稀有度：6%（野性带刺的傲骨玫瑰）", tag:"#傲骨侠肠", scores:{X:35,M:15,Z:40,Q:55,K:50,Y:30} , peer:"郭襄", profile:"你有刺，也有心。你的防御性来自曾经受过的伤，但那层壳之下是一个感受极其丰富的人。真正了解你的人，都知道你的尖锐是保护，不是拒绝。"},
+        { g:"F", name:"建宁公主", img:"jianninggongzhu.png", mate:"韦小宝", enemy:"规矩", rarity:"江湖稀有度：5%（古灵精怪的抖M狂后）", tag:"#古灵精怪", scores:{X:15,M:20,Z:30,Q:45,K:58,Y:10} , peer:"阿紫", profile:"你活得很自我，要什么就要什么，不爽了就说不爽。这份坦率在这个时代是稀缺品。你并不坏，只是需要一个够强大的人，既能接住你，又不被你吓跑。"},
+        { g:"F", name:"史红石", img:"shihongshi.png", mate:"黄蓉", enemy:"陈友谅", rarity:"江湖稀有度：15%（初生牛犊的幼年帮主）", tag:"#初生牛犊", scores:{X:45,M:20,Z:35,Q:30,K:35,Y:15} , peer:"郭襄", profile:"你有初生牛犊的勇气和干劲，还没被现实磨出太多棱角。这是优势，也是需要保护的东西。在你的热血里，慢慢积累经验——不要让挫折磨掉你最珍贵的那份冲劲。"},
+        { g:"F", name:"傻姑", img:"shagu.png", mate:"黄药师", enemy:"坏人", rarity:"江湖稀有度：8%（大智若愚的无邪真相）", tag:"#大智若愚", scores:{X:30,M:5,Z:25,Q:20,K:40,Y:55} , peer:"虚竹", profile:"你用自己的方式感知世界，那个方式可能和大多数人不同，但未必是错的。你的直觉往往比别人的分析更接近真相。守住你的内心，不要被「正常」的定义说服。"}
     ];
 
     const questions = [
@@ -585,25 +698,100 @@
 
         currentBestMatch = findBestMatch(selectedGender);
         const bestMatch = currentBestMatch;
+        const normalized = normalizeScore(userScore);
 
-        // 填充基础信息
-        ['name','tag','rarity','mate','enemy'].forEach(f => {
-            document.getElementById('role-' + f).innerText = bestMatch[f];
-        });
+        // 按分值排序所有维度
+        const traitKeys = ['X','M','Z','Q','K','Y'];
+        const sorted = [...traitKeys].sort((a,b) => normalized[b] - normalized[a]);
+        const topKey = sorted[0];
+        const topTrait = traitInfo[topKey];
+
+        // ① 头部基础信息
+        document.getElementById('role-name').innerText = bestMatch.name;
+        document.getElementById('role-tag').innerText = bestMatch.tag;
+        document.getElementById('role-rarity').innerText = bestMatch.rarity;
         document.getElementById('role-img-display').src = bestMatch.img;
         document.getElementById('role-img-display').alt = bestMatch.name;
 
-        // 最高分维度
-        const normalized = normalizeScore(userScore);
-        const topTraitKey = Object.keys(normalized).reduce((a, b) => normalized[a] > normalized[b] ? a : b);
-        const topTrait = traitInfo[topTraitKey];
-
+        // ② 武学心法（最高维度格言）
         document.getElementById('role-mantra').innerText = topTrait.mantra;
-        document.getElementById('role-desc').innerText = `你在现代生活中展现出的${bestMatch.tag}特质，与${bestMatch.name}的灵魂高度契合。${topTrait.detail}`;
+
+        // ③ 江湖原型解析 = 角色 profile + 主维度 detail
+        document.getElementById('role-desc').innerText =
+            (bestMatch.profile || '') + '\n\n' + topTrait.detail;
+
+        // ④ 六维雷达逐项解读
+        const traitsDiv = document.getElementById('role-traits');
+        traitsDiv.innerHTML = '';
+        traitKeys.forEach(key => {
+            const t = traitInfo[key];
+            const val = Math.round(normalized[key]);
+            const pct = Math.round((val / 60) * 100);
+            let levelText, levelColor;
+            if (pct >= 70)      { levelText = t.desc_high; levelColor = '#962f23'; }
+            else if (pct >= 35) { levelText = t.desc_mid;  levelColor = '#c19a6b'; }
+            else                { levelText = t.desc_low;  levelColor = '#9ca3af'; }
+
+            const el = document.createElement('div');
+            el.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                    <span style="font-size:12px;font-weight:700;color:${levelColor}">${t.name} <span style="font-size:10px;color:#9ca3af;font-weight:400">${t.explain}</span></span>
+                    <span style="font-size:11px;font-weight:700;color:${levelColor}">${pct}%</span>
+                </div>
+                <div style="height:4px;background:#f3f4f6;border-radius:99px;margin-bottom:6px;overflow:hidden">
+                    <div style="height:100%;width:${pct}%;background:${levelColor};border-radius:99px;transition:width 0.8s ease"></div>
+                </div>
+                <p style="font-size:11px;color:#6b7280;line-height:1.6">${levelText}</p>
+            `;
+            traitsDiv.appendChild(el);
+        });
+
+        // ⑤ 优势与软肋（取最高2维的strengths / 最高维度的weaknesses）
+        const topTwo = sorted.slice(0,2);
+        const strengthsList = document.getElementById('role-strengths');
+        strengthsList.innerHTML = '';
+        topTwo.forEach(key => {
+            traitInfo[key].strengths.forEach(s => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span style="color:#2a6b3f;margin-right:4px">▸</span>${s}`;
+                strengthsList.appendChild(li);
+            });
+        });
+
+        const weaknessesList = document.getElementById('role-weaknesses');
+        weaknessesList.innerHTML = '';
+        traitInfo[topKey].weaknesses.forEach(w => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span style="color:#962f23;margin-right:4px">▸</span>${w}`;
+            weaknessesList.appendChild(li);
+        });
+
+        // ⑥ 当代行为画像（取主维度的 modern）
+        const modernDiv = document.getElementById('role-modern');
+        modernDiv.innerHTML = '';
+        topTrait.modern.forEach(m => {
+            const el = document.createElement('div');
+            el.style.cssText = 'display:flex;gap:10px;align-items:flex-start';
+            el.innerHTML = `
+                <div style="font-size:16px;flex-shrink:0;margin-top:1px">${m.icon}</div>
+                <div>
+                    <span style="font-size:10px;font-weight:700;color:#9ca3af;display:block;margin-bottom:2px">${m.label}</span>
+                    <span style="font-size:12px;color:#4b5563;line-height:1.6">${m.text}</span>
+                </div>
+            `;
+            modernDiv.appendChild(el);
+        });
+
+        // ⑦ 建议
         document.getElementById('role-advice').innerText = topTrait.advice;
 
-        // 雷达图用归一化分数，使量程与角色一致
-        const vals = [normalized.X, normalized.M, normalized.Z, normalized.Q, normalized.K, normalized.Y].map(v => Math.round(v));
+        // ⑧ 三联关系
+        document.getElementById('role-mate').innerText = bestMatch.mate;
+        document.getElementById('role-enemy').innerText = bestMatch.enemy;
+        document.getElementById('role-peer').innerText = bestMatch.peer || '—';
+
+        // 雷达图
+        const vals = traitKeys.map(k => Math.round(normalized[k]));
         if (radarChart) radarChart.destroy();
         radarChart = initRadar('radarChart', vals);
     }
