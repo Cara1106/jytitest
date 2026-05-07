@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -218,6 +219,91 @@
             <button onclick="generatePoster()" class="py-4 bg-vermilion text-white rounded-2xl font-bold shadow-lg active:scale-95 transition">生成海报</button>
             <button onclick="resetQuiz()" class="py-4 bg-white text-ink border border-gray-200 rounded-2xl font-bold active:scale-95 transition">重新测试</button>
         </div>
+
+        <!-- ⑩ 圣地禁区入口 -->
+        <div id="sanctuary-entry" onclick="scrollToForum()" class="mx-2 cursor-pointer select-none" style="background:linear-gradient(135deg,#1a0a0a 0%,#2d1010 50%,#1a0a0a 100%);border-radius:20px;padding:20px 24px;border:1px solid rgba(150,47,35,0.4);position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(150,47,35,0.03) 10px,rgba(150,47,35,0.03) 20px);pointer-events:none"></div>
+            <div style="position:relative">
+                <div style="font-size:9px;font-weight:700;color:rgba(193,154,107,0.6);letter-spacing:0.4em;margin-bottom:8px;text-transform:uppercase">⚔ 天选之人专属通道</div>
+                <div style="font-size:17px;font-weight:900;color:#f5f0e8;letter-spacing:0.05em;line-height:1.3;margin-bottom:8px">你已被江湖认定<br><span style="color:#c19a6b">进入圣地禁区修炼</span></div>
+                <div style="font-size:11px;color:rgba(245,240,232,0.5);line-height:1.6;margin-bottom:14px">此处聚集着与你同道之人——留下你的江湖印记，与天下侠客论道切磋</div>
+                <div style="display:flex;align-items:center;gap:6px">
+                    <div style="font-size:11px;font-weight:700;color:#c19a6b;letter-spacing:0.1em">踏入禁区</div>
+                    <div style="font-size:14px;color:#c19a6b">↓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⑪ 江湖布告栏（讨论区） -->
+        <div id="forum-section" class="mx-2 space-y-4">
+
+            <!-- 标题 -->
+            <div class="text-center py-2">
+                <div style="font-size:9px;font-weight:700;color:#c19a6b;letter-spacing:0.4em;margin-bottom:6px">◈ 江湖布告栏 ◈</div>
+                <div style="font-size:11px;color:#9ca3af;line-height:1.6">与 <span id="forum-total-count" style="color:#962f23;font-weight:700">—</span> 位侠客共聚于此</div>
+            </div>
+
+            <!-- 公约 -->
+            <div style="background:#fffbf5;border:1px solid rgba(193,154,107,0.2);border-radius:14px;padding:12px 16px;">
+                <div style="font-size:9px;font-weight:700;color:#c19a6b;letter-spacing:0.2em;margin-bottom:6px">◎ 江湖公约</div>
+                <div style="font-size:11px;color:#6b7280;line-height:1.8">
+                    不骂人 · 不广告 · 说真话<br>
+                    <span style="font-size:10px;color:#9ca3af">违者将被驱逐出江湖，永不录用</span>
+                </div>
+            </div>
+
+            <!-- 一键评论 -->
+            <div id="quick-comments-wrap" style="background:white;border:1px solid #f0ede8;border-radius:16px;padding:14px 16px;">
+                <div style="font-size:9px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;margin-bottom:10px">◎ 一键印记 · 点击直接发送</div>
+                <div id="quick-comment-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+
+            <!-- 发言框 -->
+            <div style="background:white;border:1px solid #f0ede8;border-radius:16px;padding:16px;">
+                <div style="font-size:9px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;margin-bottom:10px">◎ 留下你的江湖印记</div>
+
+                <!-- 引导问题 tabs -->
+                <div id="prompt-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+                    <button onclick="selectPrompt(this,'这个结果，你服还是不服？说个最像的现实场景')" style="font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;transition:all 0.15s" class="prompt-tab">服还是不服？</button>
+                    <button onclick="selectPrompt(this,'你身边有哪个角色的人？和他们相处是什么感觉')" style="font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;transition:all 0.15s" class="prompt-tab">身边的江湖人</button>
+                    <button onclick="selectPrompt(this,'你和哪个角色的人最合得来，或最clash？')" style="font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;transition:all 0.15s" class="prompt-tab">江湖缘分</button>
+                    <button onclick="selectPrompt(this,'')" style="font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;transition:all 0.15s" class="prompt-tab">自由发言</button>
+                </div>
+
+                <!-- 文本框 -->
+                <textarea id="comment-input" placeholder="写下你的感悟……" style="width:100%;min-height:80px;border:1px solid #f0ede8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1a1a;background:#fbfaf8;resize:none;outline:none;box-sizing:border-box;line-height:1.6" maxlength="200" oninput="updateCharCount(this)"></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;margin-bottom:12px">
+                    <span id="char-count" style="font-size:10px;color:#d1d5db">0 / 200</span>
+                    <span style="font-size:10px;color:#d1d5db">文明江湖，感谢守护</span>
+                </div>
+
+                <!-- 署名选择 -->
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+                    <span style="font-size:10px;color:#9ca3af;flex-shrink:0">以何人身份现身：</span>
+                    <div style="display:flex;align-items:center;gap:6px;flex:1">
+                        <button id="anon-btn" onclick="toggleAnon(true)" style="font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0">匿名侠客</button>
+                        <button id="named-btn" onclick="toggleAnon(false)" style="font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0">自报名号</button>
+                        <input id="nickname-input" placeholder="你的江湖名号" style="display:none;flex:1;min-width:0;border:1px solid #f0ede8;border-radius:8px;padding:4px 10px;font-size:12px;font-family:inherit;outline:none;background:#fbfaf8" maxlength="20">
+                    </div>
+                </div>
+
+                <!-- 发送按钮 -->
+                <button onclick="submitComment()" id="submit-btn" style="width:100%;padding:12px;background:#1a1a1a;color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.05em;transition:background 0.2s">
+                    投入江湖
+                </button>
+                <div id="submit-msg" style="font-size:11px;text-align:center;margin-top:8px;min-height:16px;color:#962f23"></div>
+            </div>
+
+            <!-- 评论列表 -->
+            <div id="comments-list" style="space-y:0"></div>
+
+            <!-- 加载更多 -->
+            <div id="load-more-wrap" style="text-align:center;padding:8px;display:none">
+                <button onclick="loadMoreComments()" style="font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:inherit;letter-spacing:0.1em">展开更多江湖往事 ↓</button>
+            </div>
+
+        </div>
+
     </div>
 
     <!-- ══════════════ 海报 overlay ══════════════ -->
@@ -859,6 +945,11 @@
         const vals = traitKeys.map(k => Math.round(normalized[k]));
         if (radarChart) radarChart.destroy();
         radarChart = initRadar('radarChart', vals);
+
+        // 讨论区 + 一键评论 + 结果留存
+        initForum(bestMatch.name);
+        renderQuickComments(bestMatch.name);
+        saveResult(bestMatch, normalized, selectedGender);
     }
 
     // ══════════════════════════════════════════════
@@ -988,6 +1079,152 @@
     }
 
     // ══════════════════════════════════════════════
+    //  一键评论预设句库（每个角色3条 + 通用2条兜底）
+    // ══════════════════════════════════════════════
+    const QUICK_COMMENTS = {
+        "郭靖":    ["测出郭靖……侠之大者这四个字，说实话有点重。","我就知道我会是郭靖，认死理这件事从来改不掉。","郭靖的「笨」和「诚」，居然被我活成了日常。"],
+        "乔峰":    ["乔峰……原来我一直在用扛住一切来代替求助。","这个结果让我沉默了一会儿，乔峰的孤独真的很准。","武力值顶格，情绪垃圾桶也顶格，说的就是我。"],
+        "令狐冲":  ["令狐冲！自由这件事，我确实从来没妥协过。","测出令狐冲，说明我的「混」其实是一种选择。","江湖人管不了我，但我又确实很在乎身边那几个人。"],
+        "张无忌":  ["张无忌……优柔寡断这个词我已经听了二十年了。","好人缘这件事是真的，但好人缘有时候真的很累。","测出张无忌，说明我善良到有点危险了。"],
+        "段誉":    ["段誉的痴劲儿……我确实很难对一件事半心半意。","爱上一个人之后我也会变得很蠢，认了。","风流倜傥是别人说的，我只是认真对待每一份喜欢。"],
+        "胡斐":    ["胡斐，爱憎分明——对，我就是过不了自己那关。","看见不公平我真的会手痒，忍不了那种感觉。","测出胡斐，感觉我这辈子要为「值不值」纠结到老了。"],
+        "石破天":  ["石破天……我可能真的比别人少一些心机。","单纯不代表蠢，我只是懒得算那么多。","被人说过很多次太好骗了，看来不是气话。"],
+        "袁承志":  ["袁承志，领袖气质——说实话我只是不想让大家失望。","稳重这个词，有时候让我觉得自己活得很用力。","该扛的我都扛，但有时候真的想甩手不管。"],
+        "陈家洛":  ["陈家洛……理想主义者，现实一直在打我的脸。","我也知道有些事做不到，但我就是说不出放弃。","书生意气，大概是我这辈子甩不掉的标签了。"],
+        "狄云":    ["狄云，被辜负过之后还相信人——我懂这种固执。","黑暗没有击垮我，但确实改变了我看人的方式。","涅槃重生这个词很漂亮，但过程真的不好受。"],
+        "欧阳锋":  ["欧阳锋……偏执这件事，我从来不觉得是缺点。","走自己的路，哪怕走反了，也比跟着走好看。","天下第一的执念，换成我这里叫「不到最好不罢休」。"],
+        "岳不群":  ["岳不群……我也会隐忍，但我希望我藏的是善意。","布局深远这件事我认，但我尽量不伤人。","君子剑的人设，维护起来其实很消耗。"],
+        "金轮法王":["金轮法王，宗师感十足——我对自己确实要求很高。","我对平庸有一种本能的排斥，这个测得准。","带徒弟这件事让我破防了，我确实很难容忍进度慢。"],
+        "慕容复":  ["慕容复……背负着一个必须实现的目标，真的很累。","我也有那种「不能停」的感觉，停下来就会崩。","执念这个词，我比任何人都理解得更具体。"],
+        "林平之":  ["林平之，仇恨当燃料——我也经历过，也反思过。","被逼到绝境之后还能站起来，这一点我认。","向死而生，有点虚，但我真的是从很深的地方爬出来的。"],
+        "成昆":    ["成昆……算无遗策，我只希望我的算计是向善的。","洞察力这件事是真的，但我在意用在哪里。","每一步都看三步之后，有时候自己都觉得累。"],
+        "游坦之":  ["游坦之……我也爱过一个不该爱的人，懂那种卑微。","深情是优点还是缺点，我到现在还没想清楚。","为了一个人变成另一个人，这件事我做过。"],
+        "左冷禅":  ["左冷禅，权谋至上——我只是喜欢把事情掌握在手里。","秩序感很强这个评价，我觉得是夸我。","铁腕这个词有点凶，但有时候就是需要有人来定规矩。"],
+        "丁春秋":  ["丁春秋……我确实不太在意别人怎么看我。","唯我独尊说得有点过，但我真的不喜欢被管。","逍遥派的感觉就是，我只对我自己负责。"],
+        "田归农":  ["田归农……精致利己这个词，我接受但我也在改。","缝隙求存这件事，在某些阶段真的没办法。","我比较务实，这件事我认，但我有底线。"],
+        "周伯通":  ["周伯通！终于有人告诉我，玩耍也是一种人生态度。","老顽童的快乐是真实的——我也不想装大人了。","无忧无虑这件事我做得到，但我不是真的不在乎。"],
+        "韦小宝":  ["韦小宝……运气好这件事，背后其实是会做人。","左右逢源听起来油，但我只是不想让人难堪。","我在任何地方都能找到朋友，这个确实准。"],
+        "田伯光":  ["田伯光，快活浪子——我的欲望从来不遮掩，这是真的。","规矩是给不自由的人定的，我从来不这么认为但我理解了。","不落俗套这个标签，我喜欢。"],
+        "谢逊":    ["谢逊……爱得深，恨得也深，两者都是真的。","金毛狮王的霸气背后，是一个很怕失去的人。","狂是表面，内心其实比谁都认真。"],
+        "南海鳄神":["南海鳄神！言出必行，这一点我可以拍胸脯。","我说的话我负责，哪怕别人觉得我轴。","憨这个字我接受，但我从来不说假话。"],
+        "桃根仙":  ["桃根仙……我的思路别人跟不上，这件事我习惯了。","思维跳跃不是乱，只是我看到了不同的东西。","胡搅蛮缠是别人的评价，我叫另辟蹊径。"],
+        "祖千秋":  ["祖千秋！对细节的执着，我也有，只是领域不同。","雅癖这个词，我愿意接受——有标准不是坏事。","讲究二字，是我对自己最基本的要求。"],
+        "柯镇恶":  ["柯镇恶，一生不服——我的倔，认识我的人都知道。","硬颈这件事，吃过亏，但改不了，也不想改。","眼瞎心明，这句话说的是柯镇恶，也是我。"],
+        "虚竹":    ["虚竹……好运气背后，是我真的没坏心眼。","随缘随性，我做到了，但不是因为懒，是因为信任。","意外得到的东西，我反而最珍惜。"],
+        "茅十八":  ["茅十八！豪气干云，我就是那种看不惯就要说的人。","草莽英雄不是贬义，是我最真实的状态。","江湖义气，可能过时，但我做不到视而不见。"],
+        "黄蓉":    ["黄蓉！聪明用来爱人，这个方向我很认同。","玲珑心这个词，我接受，但我真的不是故意算计的。","智计百出是真的，但我更在意那些被我保护的人。"],
+        "小龙女":  ["小龙女……至纯至净，说的就是我懒得伪装。","我的冷淡不是拒绝，只是我需要先确认你值得。","古墓派的清净，真的就是我想要的生活。"],
+        "任盈盈":  ["任盈盈，从容大度——其实是练出来的，不是天生的。","我很少急，因为我知道急没有用。","看透了很多，但选择继续温柔，这需要力气。"],
+        "程灵素":  ["程灵素……付出不求回报，说出来都觉得自己有点傻。","我给的多，但我清楚，这是我的选择，不是亏欠。","蕙质兰心，希望有人看见——哪怕只有一个人。"],
+        "郭襄":    ["郭襄！我也有那种「看见了就要做点什么」的冲动。","豪爽可爱这个词，我朋友们说的，我不好意思认。","灿烂如火花，燃得快，但每一下都是真的。"],
+        "阿朱":    ["阿朱……为喜欢的人变成另一个人，我做过。","温柔体贴不是软弱，是我的主动选择。","宿命这个词太重了，但我确实遇到过那样的人。"],
+        "王语嫣":  ["王语嫣，武学字典——换成我这里叫什么都要搞懂。","博学多才这个标签，我接受，但我也会撒娇。","知道很多，但有时候反而不敢行动，这个准。"],
+        "双儿":    ["双儿……忠诚这件事，我从来不觉得是负担。","纯善是真的，但我不蠢，只是选择相信。","给了就给了，我从来不算着要回来。"],
+        "穆念慈":  ["穆念慈，从一而终——这辈子我只会认真爱一个人。","坚贞这个词，放在现在有点过时，但我做不到将就。","我知道执着会受伤，但我没办法假装不在乎。"],
+        "仪琳":    ["仪琳……如水温柔，我确实很难对人起恶意。","慈悲这个字，我没资格说，但我一直在练。","我遇见需要帮助的人，就是忍不住，改不了。"],
+        "李莫愁":  ["李莫愁……问世间情为何物，我也问过自己。","偏执疯狂说得重，但爱到极致，界限确实会模糊。","赤练情魔的底色，是一个曾经很纯粹的人。"],
+        "梅超风":  ["梅超风，孤独复仇——那种只剩一件事可做的感觉，我懂。","暗黑之光，我愿意这样理解自己的某个阶段。","在黑暗里独自燃烧，这句话让我沉默了一会儿。"],
+        "周芷若":  ["周芷若……我也会为了某个目标，把自己改造成另一个人。","事业至上这件事，我现在理解了，代价是真实的。","黑化不是变坏，是在某个瞬间决定不再委屈自己。"],
+        "康敏":    ["康敏……渴望被看见这件事，我也有，只是方式不同。","偏执背后是受过伤，这个我理解，也反思过。","美丽和危险并存，这个组合我接受。"],
+        "灭绝师太":["灭绝师太……我对某些事的坚持，确实让人觉得偏执。","守护信念这件事，哪怕付出代价，我也做过。","铁腕不是冷酷，是因为太在乎那件事了。"],
+        "叶二娘":  ["叶二娘……失去之后还能站着，这需要一种很扭曲的力量。","我也有那种填不满的洞，只是我选择了另一种方式。","悲情不是我的标签，但那份深爱是真实存在过的。"],
+        "何铁手":  ["何铁手，亦正亦邪——我从来不是非此即彼的人。","娇媚妖女这个词，我觉得是在夸我。","我可以很好，也可以很难搞，这取决于你怎么对我。"],
+        "裘千尺":  ["裘千尺……恨之入骨背后，是爱过。","我也有那种「你让我失望了」的时刻，只是我没走那条路。","幽冥怨灵太悲壮了，但那份执念我懂。"],
+        "班淑娴":  ["班淑娴，掌控全局——我对失控确实有一种本能的抗拒。","悍妒这个词太凶，但我承认我很难假装不在乎。","我只是不喜欢被排在局外，这个我认。"],
+        "毛东珠":  ["毛东珠……深不可测，我不是故意的，只是不习惯被人看透。","特工感我喜欢，但我希望有一天可以卸下来。","所有面具之下，我还保留着一个真实的自己。"],
+        "蓝凤凰":  ["蓝凤凰！率性而为，这是我对自己最满意的地方。","异域娇娃这个词，我理解为「和你们不一样」，我接受。","主流的规则我不一定遵守，但我有自己的底线。"],
+        "阿紫":    ["阿紫……要的我就要，不要的推走，这个准。","妖娇诡谲说得太凶，我只是比较直接。","顽劣是别人的评价，我叫真性情。"],
+        "天山童姥":["天山童姥！气场这件事，我从来不是故意的，就是有。","唯我独尊说得大，但在我的领域，我确实不服输。","硬核霸道，我的朋友看到这个会笑。"],
+        "赵敏":    ["赵敏！越说不可能我越要试，这个基因改不了。","巾帼统帅，这个标签我要了。","我的执念不是固执，是我知道我能做到。"],
+        "瑛姑":    ["瑛姑……爱恨交织了太久，是时候让自己喘口气了。","痴心奇人，我把这个理解为：我爱起来是认真的。","她在沼泽里等了几十年，我也有过那种等待。"],
+        "钟灵":    ["钟灵！娇俏可人，我朋友们说这个词专门是为我造的。","活泼甜心——我就是觉得人生不用那么沉重。","我带得起气氛，但我也有认真想事情的时候。"],
+        "木婉清":  ["木婉清，带刺的玫瑰——准，我的尖锐都是保护自己的。","傲骨侠肠这四个字，我愿意用一辈子来配得上。","靠近我的人会知道，刺里面是真心。"],
+        "建宁公主":["建宁公主……古灵精怪，我从小被这四个字形容到大。","我要的我会说，我的情绪我不藏，这叫真实不叫任性。","能接住我的人，才是真的厉害。"],
+        "史红石":  ["史红石，初生牛犊——我知道我还有很多不懂，但我不怕。","那股冲劲儿，我希望自己永远保留着。","年轻不是弱点，是我现在最大的资本。"],
+        "傻姑":    ["傻姑……大智若愚，希望是这样，不是真的愚。","我的感知方式和别人不一样，但我觉得我看到了别人没看到的东西。","无邪真相，这四个字，我把它当成夸奖。"]
+    };
+
+    // 通用兜底（角色不在库里时使用）
+    const QUICK_COMMENTS_DEFAULT = [
+        "这个结果让我沉默了一会儿，比我想象的准。",
+        "测出这个角色，终于有人告诉我我是谁了。",
+        "准到有点不舒服，但我接受。",
+        "原来我在现代江湖里，活成了这个样子。",
+        "分享给朋友，看看他们有什么话说。"
+    ];
+
+    // ── 渲染一键评论卡片 ──
+    function renderQuickComments(roleName) {
+        const wrap = document.getElementById('quick-comment-list');
+        if (!wrap) return;
+        wrap.innerHTML = '';
+        const pool = QUICK_COMMENTS[roleName] || QUICK_COMMENTS_DEFAULT;
+        // 每次随机取3条（如果够的话），保持新鲜感
+        const items = pool.length <= 3 ? pool : shuffleArray(pool).slice(0, 3);
+        items.forEach(text => {
+            const card = document.createElement('div');
+            card.style.cssText = 'border:1px solid #f0ede8;border-radius:10px;padding:10px 14px;cursor:pointer;transition:all 0.15s;display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fbfaf8';
+            card.innerHTML = `
+                <span style="font-size:12px;color:#374151;line-height:1.6;flex:1">${escapeHtml(text)}</span>
+                <span style="font-size:18px;flex-shrink:0;color:#962f23;font-weight:700">+</span>
+            `;
+            card.addEventListener('mouseover', () => { card.style.borderColor = '#962f23'; card.style.background = '#fff8f5'; });
+            card.addEventListener('mouseout',  () => { card.style.borderColor = '#f0ede8'; card.style.background = '#fbfaf8'; });
+            card.addEventListener('click', () => quickFill(text, card));
+            wrap.appendChild(card);
+        });
+    }
+
+    function quickFill(text, card) {
+        // 填入文本框
+        const textarea = document.getElementById('comment-input');
+        textarea.value = text;
+        updateCharCount(textarea);
+        // 视觉反馈
+        card.style.background = '#fdf3f1';
+        card.style.borderColor = '#962f23';
+        setTimeout(() => {
+            card.style.background = '#fbfaf8';
+            card.style.borderColor = '#f0ede8';
+        }, 600);
+        // 滚到文本框
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        textarea.focus();
+    }
+
+    function shuffleArray(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // ══════════════════════════════════════════════
+    //  结果留存（静默写入 results 表）
+    // ══════════════════════════════════════════════
+    async function saveResult(bestMatch, normalizedScores, gender) {
+        const db = getSupabase();
+        if (!db) return;
+        try {
+            await db.from('results').insert({
+                role_name:  bestMatch.name,
+                role_tag:   bestMatch.tag,
+                gender:     gender,
+                score_x:    Math.round(normalizedScores.X),
+                score_m:    Math.round(normalizedScores.M),
+                score_z:    Math.round(normalizedScores.Z),
+                score_q:    Math.round(normalizedScores.Q),
+                score_k:    Math.round(normalizedScores.K),
+                score_y:    Math.round(normalizedScores.Y)
+            });
+        } catch(e) {
+            // 静默失败，不影响用户体验
+        }
+    }
+
+    // ══════════════════════════════════════════════
     //  重新测试（不刷页）
     // ══════════════════════════════════════════════
     function resetQuiz() {
@@ -1000,6 +1237,232 @@
         showPage('start-page');
         window.scrollTo(0, 0);
     }
+
+    // ══════════════════════════════════════════════
+    //  Supabase 讨论区
+    // ══════════════════════════════════════════════
+
+    const SUPA_URL = 'https://psavjdgmvgtjcuwukzxq.supabase.co';
+    const SUPA_KEY = 'sb_publishable_eYnFohrFvoOz7k3Grkv9wA_WNiotj_n';
+    let _supabase = null;
+    function getSupabase() {
+        if (!_supabase) {
+            if (!window.supabase) { console.error('Supabase SDK not loaded'); return null; }
+            _supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+        }
+        return _supabase;
+    }
+
+    const PAGE_SIZE = 8;
+    let commentOffset = 0;
+    let isAnon = true;
+    let selectedPromptText = '';
+    let currentRoleName = '';
+
+    // 违禁词列表（前端初筛，后端 RLS 是第二道防线）
+    const BANNED_WORDS = [
+        '妈的','傻逼','sb','cnm','wc','操你','去死','垃圾人','废物',
+        '广告','微信','加我','私聊','代购','点击','链接','http'
+    ];
+
+    function containsBannedWords(text) {
+        const lower = text.toLowerCase();
+        return BANNED_WORDS.some(w => lower.includes(w));
+    }
+
+    // ── UI 辅助 ──
+    function updateCharCount(el) {
+        document.getElementById('char-count').textContent = el.value.length + ' / 200';
+    }
+
+    function scrollToForum() {
+        document.getElementById('forum-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function toggleAnon(anon) {
+        isAnon = anon;
+        const anonBtn  = document.getElementById('anon-btn');
+        const namedBtn = document.getElementById('named-btn');
+        const nickInput = document.getElementById('nickname-input');
+        if (anon) {
+            anonBtn.style.cssText  = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0';
+            namedBtn.style.cssText = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0';
+            nickInput.style.display = 'none';
+        } else {
+            namedBtn.style.cssText = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0';
+            anonBtn.style.cssText  = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0';
+            nickInput.style.display = 'block';
+            nickInput.focus();
+        }
+    }
+
+    function selectPrompt(btn, text) {
+        selectedPromptText = text;
+        document.querySelectorAll('.prompt-tab').forEach(b => {
+            b.style.background = 'white';
+            b.style.color = '#6b7280';
+            b.style.borderColor = '#e5e7eb';
+        });
+        btn.style.background = '#1a1a1a';
+        btn.style.color = 'white';
+        btn.style.borderColor = '#1a1a1a';
+        const textarea = document.getElementById('comment-input');
+        if (text && !textarea.value) {
+            textarea.placeholder = text + '……';
+        } else if (!text) {
+            textarea.placeholder = '写下你的感悟……';
+        }
+        textarea.focus();
+    }
+
+    // ── 提交评论 ──
+    async function submitComment() {
+        const db = getSupabase(); if (!db) return;
+        const btn = document.getElementById('submit-btn');
+        const msgEl = document.getElementById('submit-msg');
+        const text = document.getElementById('comment-input').value.trim();
+
+        if (!text) { msgEl.textContent = '说点什么吧，侠客'; return; }
+        if (text.length < 3) { msgEl.textContent = '再多说两个字'; return; }
+        if (containsBannedWords(text)) {
+            msgEl.textContent = '江湖有公约，请文明论道';
+            return;
+        }
+
+        let author = '匿名侠客';
+        if (!isAnon) {
+            const nick = document.getElementById('nickname-input').value.trim();
+            if (!nick) { msgEl.textContent = '请填写你的江湖名号'; return; }
+            if (nick.length > 20) { msgEl.textContent = '名号太长，江湖人记不住'; return; }
+            if (containsBannedWords(nick)) { msgEl.textContent = '此名号不雅，请另取'; return; }
+            author = nick;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '传书中……';
+        msgEl.textContent = '';
+
+        const { error } = await getSupabase().from('comments').insert({
+            role_name: currentRoleName,
+            author,
+            content: text,
+            prompt: selectedPromptText || null,
+            is_anon: isAnon
+        });
+
+        if (error) {
+            msgEl.textContent = '传书失败，稍后再试';
+            btn.disabled = false;
+            btn.textContent = '投入江湖';
+            return;
+        }
+
+        // 成功
+        document.getElementById('comment-input').value = '';
+        document.getElementById('char-count').textContent = '0 / 200';
+        btn.disabled = false;
+        btn.textContent = '投入江湖';
+        msgEl.style.color = '#2a6b3f';
+        msgEl.textContent = '✓ 你的印记已留入江湖';
+        setTimeout(() => { msgEl.textContent = ''; msgEl.style.color = '#962f23'; }, 3000);
+
+        // 刷新列表
+        commentOffset = 0;
+        document.getElementById('comments-list').innerHTML = '';
+        await loadComments();
+    }
+
+    // ── 加载评论 ──
+    async function loadComments() {
+        const db = getSupabase(); if (!db) return;
+        const { data, error, count } = await db
+            .from('comments')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(commentOffset, commentOffset + PAGE_SIZE - 1);
+
+        if (error || !data) return;
+
+        // 更新总数
+        if (count !== null) {
+            document.getElementById('forum-total-count').textContent = count.toLocaleString();
+        }
+
+        const list = document.getElementById('comments-list');
+        data.forEach(c => {
+            const el = buildCommentCard(c);
+            list.appendChild(el);
+        });
+
+        commentOffset += data.length;
+        document.getElementById('load-more-wrap').style.display =
+            data.length === PAGE_SIZE ? 'block' : 'none';
+    }
+
+    function loadMoreComments() {
+        loadComments();
+    }
+
+    function buildCommentCard(c) {
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'background:white;border:1px solid #f0ede8;border-radius:14px;padding:14px 16px;margin-bottom:10px';
+
+        const timeStr = formatTime(c.created_at);
+        const roleTag = c.role_name ? `<span style="font-size:9px;color:#962f23;background:#fdf3f1;padding:2px 8px;border-radius:99px;margin-left:6px">${c.role_name}</span>` : '';
+        const promptTag = c.prompt ? `<div style="font-size:10px;color:#9ca3af;margin-bottom:6px;font-style:italic"># ${c.prompt.slice(0,20)}…</div>` : '';
+
+        wrap.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">
+                    <span style="font-size:12px;font-weight:700;color:#1a1a1a">${escapeHtml(c.author)}</span>
+                    ${roleTag}
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:8px">
+                    <span style="font-size:10px;color:#d1d5db">${timeStr}</span>
+                    <button onclick="reportComment('${c.id}')" style="font-size:9px;color:#d1d5db;background:none;border:none;cursor:pointer;font-family:inherit;padding:0" title="举报">举报</button>
+                </div>
+            </div>
+            ${promptTag}
+            <div style="font-size:13px;color:#374151;line-height:1.7;word-break:break-all">${escapeHtml(c.content)}</div>
+        `;
+        return wrap;
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g,'&amp;')
+            .replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;');
+    }
+
+    function formatTime(iso) {
+        const d = new Date(iso);
+        const now = new Date();
+        const diff = (now - d) / 1000;
+        if (diff < 60)   return '刚刚';
+        if (diff < 3600) return Math.floor(diff/60) + ' 分钟前';
+        if (diff < 86400) return Math.floor(diff/3600) + ' 小时前';
+        return Math.floor(diff/86400) + ' 天前';
+    }
+
+    async function reportComment(id) {
+        const db = getSupabase(); if (!db) return;
+        const { error } = await db.from('reports').insert({ comment_id: id });
+        if (!error) alert('已举报，江湖执法者将尽快处理');
+    }
+
+    // ── 结果页显示时触发讨论区加载 ──
+    // 在 showResult 末尾调用 initForum(roleName)
+    async function initForum(roleName) {
+        currentRoleName = roleName;
+        commentOffset = 0;
+        document.getElementById('comments-list').innerHTML = '';
+        document.getElementById('load-more-wrap').style.display = 'none';
+        document.getElementById('forum-total-count').textContent = '—';
+        await loadComments();
+    }
+
     </script>
 </body>
 </html>
