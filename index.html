@@ -86,6 +86,21 @@
         .centered-container { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
         #quiz-page { min-height: 100vh; flex-direction: column; justify-content: center; }
         .role-image { width: 180px; height: 180px; object-fit: contain; margin-bottom: 1rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); }
+
+        /* ── 独立评论页顶栏 ── */
+        #forum-page-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: #fbfaf8;
+            border-bottom: 1px solid rgba(193,154,107,0.15);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen pb-12">
@@ -129,6 +144,10 @@
                     <button onclick="selectGender('F')" class="py-5 bg-ink text-white rounded-2xl font-bold hover:bg-vermilion shadow-lg active:scale-95 transition text-lg">女 侠</button>
                 </div>
             </div>
+            <!-- 评论区入口 -->
+            <button onclick="showForumPage()" class="w-full max-w-[340px] py-3 rounded-2xl border border-gold/30 bg-white/80 text-[13px] font-bold text-gold tracking-[0.15em] active:scale-95 transition flex items-center justify-center gap-2 shadow-sm hover:border-gold/60">
+                <span style="font-size:15px">⚔</span> 围观江湖布告栏
+            </button>
         </div>
     </div>
 
@@ -304,6 +323,49 @@
 
         </div>
 
+    </div>
+
+    <!-- ══════════════ 独立评论页 ══════════════ -->
+    <div id="forum-page" class="max-w-md w-full pb-12" style="display:none;">
+
+        <!-- 顶栏 -->
+        <div id="forum-page-header">
+            <button onclick="showPage('start-page')" style="background:none;border:none;cursor:pointer;padding:4px 8px 4px 0;font-size:13px;font-weight:700;color:#9ca3af;font-family:inherit;letter-spacing:0.05em;flex-shrink:0">← 返回</button>
+            <div style="flex:1;text-align:center">
+                <span style="font-size:11px;font-weight:700;color:#c19a6b;letter-spacing:0.3em">◈ 江湖布告栏 ◈</span>
+            </div>
+            <div style="width:48px"></div><!-- 占位平衡 -->
+        </div>
+
+        <!-- 内容 -->
+        <div class="px-4 pt-4 space-y-4">
+
+            <!-- 说明 -->
+            <div style="background:linear-gradient(135deg,#1a0a0a 0%,#2d1010 50%,#1a0a0a 100%);border-radius:20px;padding:18px 20px;border:1px solid rgba(150,47,35,0.4);">
+                <div style="font-size:9px;font-weight:700;color:rgba(193,154,107,0.6);letter-spacing:0.4em;margin-bottom:6px;text-transform:uppercase">⚔ 天下侠客聚集于此</div>
+                <div style="font-size:15px;font-weight:900;color:#f5f0e8;letter-spacing:0.05em;line-height:1.3;margin-bottom:6px">留言者已在此留下印记</div>
+                <div style="font-size:11px;color:rgba(245,240,232,0.5);line-height:1.6">完成测试后可加入讨论，留下你的江湖故事</div>
+            </div>
+
+            <!-- 去测试 CTA -->
+            <button onclick="showPage('start-page')" style="width:100%;padding:14px;background:#962f23;color:white;border:none;border-radius:14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.1em;transition:background 0.2s">
+                先去测测我是谁 →
+            </button>
+
+            <!-- 总数 -->
+            <div style="text-align:center;padding:4px 0 2px">
+                <span style="font-size:11px;color:#9ca3af">与 <span id="forum-page-total-count" style="color:#962f23;font-weight:700">—</span> 位侠客共聚于此</span>
+            </div>
+
+            <!-- 评论列表 -->
+            <div id="forum-page-comments-list"></div>
+
+            <!-- 加载更多 -->
+            <div id="forum-page-load-more-wrap" style="text-align:center;padding:8px;display:none">
+                <button onclick="loadMoreForumPage()" style="font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:inherit;letter-spacing:0.1em">展开更多江湖往事 ↓</button>
+            </div>
+
+        </div>
     </div>
 
     <!-- ══════════════ 海报 overlay ══════════════ -->
@@ -713,6 +775,8 @@
         document.getElementById('start-page').style.display  = (id === 'start-page')  ? 'flex'  : 'none';
         document.getElementById('quiz-page').style.display   = (id === 'quiz-page')   ? 'flex'  : 'none';
         document.getElementById('result-page').style.display = (id === 'result-page') ? 'block' : 'none';
+        document.getElementById('forum-page').style.display  = (id === 'forum-page')  ? 'block' : 'none';
+        if (id !== 'result-page' && id !== 'forum-page') window.scrollTo(0, 0);
     }
 
     function selectGender(g) {
@@ -1461,6 +1525,49 @@
         document.getElementById('load-more-wrap').style.display = 'none';
         document.getElementById('forum-total-count').textContent = '—';
         await loadComments();
+    }
+
+    // ── 首页入口：独立评论页 ──
+    let forumPageOffset = 0;
+    const FORUM_PAGE_SIZE = 10;
+
+    async function showForumPage() {
+        showPage('forum-page');
+        window.scrollTo(0, 0);
+        forumPageOffset = 0;
+        document.getElementById('forum-page-comments-list').innerHTML = '';
+        document.getElementById('forum-page-load-more-wrap').style.display = 'none';
+        document.getElementById('forum-page-total-count').textContent = '—';
+        await loadForumPageComments();
+    }
+
+    async function loadForumPageComments() {
+        const db = getSupabase(); if (!db) return;
+        const { data, error, count } = await db
+            .from('comments')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(forumPageOffset, forumPageOffset + FORUM_PAGE_SIZE - 1);
+
+        if (error || !data) return;
+
+        if (count !== null) {
+            document.getElementById('forum-page-total-count').textContent = count.toLocaleString();
+        }
+
+        const list = document.getElementById('forum-page-comments-list');
+        data.forEach(c => {
+            const el = buildCommentCard(c);
+            list.appendChild(el);
+        });
+
+        forumPageOffset += data.length;
+        document.getElementById('forum-page-load-more-wrap').style.display =
+            data.length === FORUM_PAGE_SIZE ? 'block' : 'none';
+    }
+
+    function loadMoreForumPage() {
+        loadForumPageComments();
     }
 
     </script>
