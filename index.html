@@ -359,6 +359,23 @@
                 先去测测我是谁 →
             </button>
 
+            <!-- 发言框（访客也可用）-->
+            <div style="background:white;border:1px solid #f0ede8;border-radius:16px;padding:16px;">
+                <div style="font-size:9px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;margin-bottom:10px">◎ 留下你的江湖印记</div>
+                <textarea id="fp-comment-input" placeholder="写下你的感悟……" style="width:100%;min-height:72px;border:1px solid #f0ede8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1a1a;background:#fbfaf8;resize:none;outline:none;box-sizing:border-box;line-height:1.6" maxlength="200" oninput="document.getElementById('fp-char-count').textContent=this.value.length+' / 200'"></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;margin-bottom:10px">
+                    <span id="fp-char-count" style="font-size:10px;color:#d1d5db">0 / 200</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+                    <span style="font-size:10px;color:#9ca3af;flex-shrink:0">身份：</span>
+                    <button id="fp-anon-btn" onclick="fpToggleAnon(true)" style="font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0">匿名侠客</button>
+                    <button id="fp-named-btn" onclick="fpToggleAnon(false)" style="font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0">自报名号</button>
+                    <input id="fp-nickname-input" placeholder="你的江湖名号" style="display:none;flex:1;min-width:0;border:1px solid #f0ede8;border-radius:8px;padding:4px 10px;font-size:12px;font-family:inherit;outline:none;background:#fbfaf8" maxlength="20">
+                </div>
+                <button onclick="submitForumPageComment()" id="fp-submit-btn" style="width:100%;padding:11px;background:#1a1a1a;color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.05em">投入江湖</button>
+                <div id="fp-submit-msg" style="font-size:11px;text-align:center;margin-top:8px;min-height:16px;color:#962f23"></div>
+            </div>
+
             <!-- 总数 -->
             <div style="text-align:center;padding:4px 0 2px">
                 <span style="font-size:11px;color:#9ca3af">与 <span id="forum-page-total-count" style="color:#962f23;font-weight:700">—</span> 位侠客共聚于此</span>
@@ -1474,9 +1491,11 @@
         loadComments();
     }
 
-    function buildCommentCard(c) {
+    function buildCommentCard(c, isNested) {
         const wrap = document.createElement('div');
-        wrap.style.cssText = 'background:white;border:1px solid #f0ede8;border-radius:14px;padding:14px 16px;margin-bottom:10px';
+        wrap.style.cssText = isNested
+            ? 'background:#fbfaf8;border-left:2px solid #f0ede8;border-radius:10px;padding:10px 14px;margin-top:8px'
+            : 'background:white;border:1px solid #f0ede8;border-radius:14px;padding:14px 16px;margin-bottom:10px';
 
         const timeStr = formatTime(c.created_at);
         const roleTag = c.role_name ? `<span style="font-size:9px;color:#962f23;background:#fdf3f1;padding:2px 8px;border-radius:99px;margin-left:6px">${c.role_name}</span>` : '';
@@ -1495,8 +1514,121 @@
             </div>
             ${promptTag}
             <div style="font-size:13px;color:#374151;line-height:1.7;word-break:break-all">${escapeHtml(c.content)}</div>
+            ${isNested ? '' : `
+            <div style="margin-top:10px">
+                <div id="replies-${c.id}" style="margin-bottom:6px"></div>
+                <button onclick="toggleReplyBox('${c.id}','${escapeHtml(c.author)}')" style="font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;letter-spacing:0.05em">↩ 回复</button>
+                <div id="reply-box-${c.id}" style="display:none;margin-top:8px">
+                    <textarea id="reply-input-${c.id}" placeholder="回复 ${escapeHtml(c.author)}……" style="width:100%;min-height:60px;border:1px solid #f0ede8;border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;background:#fbfaf8;resize:none;outline:none;box-sizing:border-box;line-height:1.5" maxlength="200"></textarea>
+                    <div style="display:flex;gap:6px;margin-top:6px;align-items:center">
+                        <button onclick="submitReply('${c.id}')" style="font-size:11px;padding:5px 14px;background:#1a1a1a;color:white;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700">发送</button>
+                        <button onclick="document.getElementById('reply-box-${c.id}').style.display='none'" style="font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:inherit">取消</button>
+                        <span id="reply-msg-${c.id}" style="font-size:10px;color:#962f23"></span>
+                    </div>
+                </div>
+            </div>`}
         `;
+
+        // 加载已有回复
+        if (!isNested) loadReplies(c.id, wrap.querySelector(`#replies-${c.id}`));
+
         return wrap;
+    }
+
+    function toggleReplyBox(parentId, authorName) {
+        const box = document.getElementById(`reply-box-${parentId}`);
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function loadReplies(parentId, container) {
+        const db = getSupabase(); if (!db) return;
+        const { data } = await db
+            .from('comments')
+            .select('*')
+            .eq('parent_id', parentId)
+            .order('created_at', { ascending: true });
+        if (!data || !data.length) return;
+        data.forEach(r => container.appendChild(buildCommentCard(r, true)));
+    }
+
+    async function submitReply(parentId) {
+        const db = getSupabase(); if (!db) return;
+        const input = document.getElementById(`reply-input-${parentId}`);
+        const msg = document.getElementById(`reply-msg-${parentId}`);
+        const text = input.value.trim();
+        if (!text) { msg.textContent = '写点什么吧'; return; }
+        if (containsBannedWords(text)) { msg.textContent = '文明江湖，请修改后再发'; return; }
+
+        const { error } = await db.from('comments').insert({
+            parent_id: parentId,
+            role_name: currentRoleName || null,
+            author: '匿名侠客',
+            content: text,
+            is_anon: true
+        });
+
+        if (error) { msg.textContent = '发送失败，稍后再试'; return; }
+
+        input.value = '';
+        document.getElementById(`reply-box-${parentId}`).style.display = 'none';
+        // 刷新该楼回复
+        const container = document.getElementById(`replies-${parentId}`);
+        if (container) { container.innerHTML = ''; loadReplies(parentId, container); }
+    }
+
+    // ── 独立布告栏页：发言 ──
+    let fpIsAnon = true;
+    function fpToggleAnon(anon) {
+        fpIsAnon = anon;
+        document.getElementById('fp-anon-btn').style.background = anon ? '#962f23' : 'white';
+        document.getElementById('fp-anon-btn').style.color = anon ? 'white' : '#6b7280';
+        document.getElementById('fp-anon-btn').style.borderColor = anon ? '#962f23' : '#e5e7eb';
+        document.getElementById('fp-named-btn').style.background = anon ? 'white' : '#962f23';
+        document.getElementById('fp-named-btn').style.color = anon ? '#6b7280' : 'white';
+        document.getElementById('fp-named-btn').style.borderColor = anon ? '#e5e7eb' : '#962f23';
+        document.getElementById('fp-nickname-input').style.display = anon ? 'none' : 'block';
+    }
+
+    async function submitForumPageComment() {
+        const db = getSupabase(); if (!db) return;
+        const btn = document.getElementById('fp-submit-btn');
+        const msg = document.getElementById('fp-submit-msg');
+        const text = document.getElementById('fp-comment-input').value.trim();
+
+        if (!text) { msg.textContent = '说点什么吧，侠客'; return; }
+        if (text.length < 3) { msg.textContent = '再多说两个字'; return; }
+        if (containsBannedWords(text)) { msg.textContent = '江湖有公约，请文明论道'; return; }
+
+        let author = '匿名侠客';
+        if (!fpIsAnon) {
+            const nick = document.getElementById('fp-nickname-input').value.trim();
+            if (!nick) { msg.textContent = '请填写你的江湖名号'; return; }
+            if (nick.length > 20) { msg.textContent = '名号太长'; return; }
+            if (containsBannedWords(nick)) { msg.textContent = '此名号不雅，请另取'; return; }
+            author = nick;
+        }
+
+        btn.disabled = true; btn.textContent = '传书中……';
+        const { error } = await db.from('comments').insert({
+            role_name: null,
+            author,
+            content: text,
+            is_anon: fpIsAnon
+        });
+
+        btn.disabled = false; btn.textContent = '投入江湖';
+        if (error) { msg.textContent = '传书失败，稍后再试'; return; }
+
+        document.getElementById('fp-comment-input').value = '';
+        document.getElementById('fp-char-count').textContent = '0 / 200';
+        msg.style.color = '#2a6b3f';
+        msg.textContent = '✓ 你的印记已留入江湖';
+        setTimeout(() => { msg.textContent = ''; msg.style.color = '#962f23'; }, 3000);
+
+        // 刷新列表
+        forumPageOffset = 0;
+        document.getElementById('forum-page-comments-list').innerHTML = '';
+        await loadForumPageComments();
     }
 
     function escapeHtml(str) {
@@ -1524,7 +1656,8 @@
     }
 
     // ── 结果页显示时触发讨论区加载 ──
-    // 在 showResult 末尾调用 initForum(roleName)
+    // 【数据库】需在 Supabase comments 表加一列：parent_id uuid references comments(id)
+    // SQL: ALTER TABLE comments ADD COLUMN parent_id uuid REFERENCES comments(id);
     async function initForum(roleName) {
         currentRoleName = roleName;
         commentOffset = 0;
