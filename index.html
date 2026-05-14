@@ -101,6 +101,60 @@
             width: 100%;
             box-sizing: border-box;
         }
+
+        @media (max-width: 430px) {
+            body { padding-bottom: 20px; }
+            #start-page {
+                min-height: 100svh;
+                padding: 22px 18px 24px !important;
+                gap: 14px !important;
+            }
+            #start-page > div { gap: 14px !important; }
+            #start-page h1 {
+                font-size: 52px !important;
+                letter-spacing: 0.16em !important;
+                margin-bottom: 0 !important;
+            }
+            #start-page p {
+                font-size: 11px !important;
+                letter-spacing: 0.12em !important;
+                white-space: normal !important;
+                line-height: 1.55 !important;
+            }
+            #start-page .grid.grid-cols-2.md\:grid-cols-4 {
+                gap: 8px !important;
+            }
+            #start-page .grid.grid-cols-2.md\:grid-cols-4 > div {
+                padding: 8px 10px !important;
+                border-radius: 14px !important;
+            }
+            #start-page .grid.grid-cols-2.md\:grid-cols-4 p:first-child {
+                font-size: 8px !important;
+                margin-bottom: 0 !important;
+            }
+            #start-page .grid.grid-cols-2.md\:grid-cols-4 p:last-child {
+                font-size: 15px !important;
+            }
+            #start-page h2 {
+                font-size: 18px !important;
+                letter-spacing: 0.1em !important;
+            }
+            #start-page button {
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+                border-radius: 14px !important;
+                font-size: 15px !important;
+            }
+            #start-page [onclick="showForumPage()"],
+            #start-page [onclick="showAdventurePage()"] {
+                padding: 12px 16px !important;
+                border-radius: 16px !important;
+            }
+            #start-page [onclick="showForumPage()"] div[style*="font-size:30px"],
+            #start-page [onclick="showAdventurePage()"] div[style*="font-size:28px"] {
+                font-size: 22px !important;
+            }
+        }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen pb-12">
@@ -255,6 +309,19 @@
         <div class="grid grid-cols-2 gap-4 px-2 pt-2">
             <button onclick="generatePoster()" class="py-4 bg-vermilion text-white rounded-2xl font-bold shadow-lg active:scale-95 transition">生成海报</button>
             <button onclick="resetQuiz()" class="py-4 bg-white text-ink border border-gray-200 rounded-2xl font-bold active:scale-95 transition">重新测试</button>
+        </div>
+
+        <!-- ⑩ 江湖探险入口 -->
+        <div onclick="showAdventurePage()" class="mx-2 cursor-pointer select-none active:scale-95 transition" style="background:linear-gradient(135deg,#0a0f1a 0%,#101e2d 60%,#0a0f1a 100%);border-radius:20px;padding:18px 24px;border:1px solid rgba(107,154,193,0.4);position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(107,154,193,0.03) 10px,rgba(107,154,193,0.03) 20px);pointer-events:none"></div>
+            <div style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px">
+                <div>
+                    <div style="font-size:9px;font-weight:700;color:rgba(107,193,154,0.6);letter-spacing:0.4em;margin-bottom:8px;text-transform:uppercase">◈ 江湖探险</div>
+                    <div style="font-size:17px;font-weight:900;color:#f5f0e8;letter-spacing:0.05em;line-height:1.3;margin-bottom:6px">以此身入书中<br><span style="color:#6bc19a">再求一支命运天签</span></div>
+                    <div style="font-size:11px;color:rgba(245,240,232,0.5);line-height:1.6">系统会带着你的角色原型，为你生成专属遭遇</div>
+                </div>
+                <div style="font-size:28px;flex-shrink:0;color:#6bc19a">🎋</div>
+            </div>
         </div>
 
         <!-- ⑩ 圣地禁区入口 -->
@@ -1784,6 +1851,72 @@
         setTimeout(() => advShowResult(choiceText), 400);
     }
 
+    function getTopTraitKey() {
+        if (!currentBestMatch) return null;
+        const normalized = normalizeScore(userScore);
+        return ['X','M','Z','Q','K','Y'].sort((a,b) => normalized[b] - normalized[a])[0];
+    }
+
+    function getChoiceGrade(choiceText) {
+        const text = choiceText || '';
+        const upperHints = ['帮', '救', '喝止', '告发', '烧掉', '问清楚', '劝', '安全', '看清', '警惕', '以绝后患'];
+        const lowerHints = ['装作没看见', '不惹麻烦', '收下黄金', '偷偷研究', '左右逢源', '加入权势', '保持沉默'];
+        if (lowerHints.some(w => text.includes(w))) return '下签';
+        if (upperHints.some(w => text.includes(w))) return '上签';
+        return '中签';
+    }
+
+    function buildLocalSign(book, scenario, choiceText) {
+        const role = currentBestMatch ? currentBestMatch.name : '普通侠客';
+        const traitKey = getTopTraitKey();
+        const traitName = traitKey ? traitInfo[traitKey].name : '缘';
+        const baseGrade = getChoiceGrade(choiceText);
+
+        const traitBoost = {
+            X: ['帮', '救', '喝止', '告发', '烧掉'],
+            M: ['看清', '问清楚', '暗中', '内容', '局势'],
+            Z: ['认真', '一定', '明确', '守', '封存'],
+            Q: ['藏好', '劝', '人情味', '躲', '祝'],
+            K: ['接招', '质问', '当场', '反问', '不可能'],
+            Y: ['绕道', '顺其自然', '放回', '中立', '等天亮']
+        };
+
+        let grade = baseGrade;
+        if (traitKey && traitBoost[traitKey].some(w => choiceText.includes(w)) && baseGrade === '中签') {
+            grade = '上签';
+        }
+
+        const titleMap = {
+            '上签': ['云开月明', '逢凶化吉', '青锋有路'],
+            '中签': ['风起萍末', '静观其变', '半明半晦'],
+            '下签': ['暗潮伏波', '一步成劫', '灯影迷途']
+        };
+        const seed = (book.id + scenario.text + choiceText + role).split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+        const title = titleMap[grade][seed % titleMap[grade].length];
+
+        const gradeTone = {
+            '上签': '此举有锋有义，虽入险地，反能借势开路。',
+            '中签': '此举不失分寸，却仍有雾色横在前路。',
+            '下签': '此举避过一时风浪，却把暗线留在身后。'
+        };
+        const bookTone = {
+            sjxx: '大漠风沙最验人心，桃花岛外也藏着因果。',
+            tldl: '少室山钟声未歇，大理月色照见一念善恶。',
+            xlwq: '江湖笑声越响，门派恩怨越难一剑斩断。',
+            yjlc: '光明顶暗道深长，屠龙刀影照出取舍。',
+            ldhc: '扬州烟火与紫禁城墙之间，最怕聪明误了本心。'
+        };
+
+        return {
+            grade,
+            title,
+            body: `${bookTone[book.id]}你以「${role}」之心作此选择，${gradeTone[grade]}此签重在一个「${traitName}」字：能进时进，能退时退，莫让一念贪惧盖过本来的清明。`,
+            yi: grade === '下签' ? '少说多看' : (grade === '中签' ? '问清来路' : '顺势行动'),
+            ji: grade === '下签' ? '贪近利' : (grade === '中签' ? '急下断语' : '错失良机'),
+            tip: currentBestMatch ? `${role}之命，贵在守住本心。` : '先测原型，可得专属命签。'
+        };
+    }
+
     async function advShowResult(choiceText) {
         document.getElementById('adv-scenario').style.display    = 'none';
         document.getElementById('adv-result').style.display      = 'block';
@@ -1793,46 +1926,8 @@
 
         const book     = advCurrentBook;
         const scenario = book.scenarios[advCurrentScenario];
-        const role     = currentBestMatch ? currentBestMatch.name : null;
-        const roleDesc = currentBestMatch ? currentBestMatch.profile : null;
 
-        const roleContext = role
-            ? `用户的江湖原型是「${role}」，其性格特点：${roleDesc}`
-            : '用户尚未测试，以普通侠客身份求签';
-
-        const prompt = `你是一位深谙金庸武侠世界的算命先生，精通《${book.name}》。
-用户正在进行江湖探险求签。
-
-背景：${roleContext}
-
-遭遇场景：${scenario.text}
-
-用户的选择：${choiceText}
-
-请根据用户的性格原型和他的选择，生成一份江湖命签，严格按以下 JSON 格式返回，不要有任何多余文字：
-{
-  "grade": "上签/中签/下签",
-  "title": "四字签名（如「柳暗花明」「山穷水尽」）",
-  "body": "三到四句话，用文言感的现代文，结合《${book.name}》里的人物或情节，解读用户这次选择所映射的命运走向，要有具体的江湖意象，不要空泛",
-  "yi": "今日宜：一件具体的事（10字内）",
-  "ji": "今日忌：一件具体的事（10字内）",
-  "tip": "一句点睛的话给用户，结合他的江湖原型性格，10到20字"
-}`;
-
-        try {
-            const res = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'claude-sonnet-4-20250514',
-                    max_tokens: 1000,
-                    messages: [{ role: 'user', content: prompt }]
-                })
-            });
-            const data = await res.json();
-            const text = data.content.map(b => b.text || '').join('').replace(/```json|```/g,'').trim();
-            const json = JSON.parse(text);
-
+        const renderSign = (json) => {
             document.getElementById('adv-sign-grade').textContent = json.grade || '中签';
             document.getElementById('adv-sign-title').textContent = json.title || '';
             document.getElementById('adv-sign-body').textContent  = json.body  || '';
@@ -1841,13 +1936,11 @@
                 `<div style="margin-bottom:10px">🚫 忌：${json.ji || '—'}</div>` +
                 `<div style="color:#962f23;font-weight:700;font-size:12px;border-top:1px solid #f0ede8;padding-top:10px">⚔ ${json.tip || '—'}</div>`;
 
-            // 签文颜色
             const gradeColor = { '上签':'#6bc19a', '中签':'#c19a6b', '下签':'#c16b6b' };
             document.getElementById('adv-sign-grade').style.color = gradeColor[json.grade] || '#c19a6b';
+        };
 
-        } catch(e) {
-            document.getElementById('adv-sign-body').textContent = '天机难测，命数未明。此次求签有误，请稍后再试。';
-        }
+        renderSign(buildLocalSign(book, scenario, choiceText));
 
         document.getElementById('adv-result-loading').style.display = 'none';
         document.getElementById('adv-result-content').style.display = 'block';
