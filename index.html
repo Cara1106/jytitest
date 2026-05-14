@@ -155,6 +155,17 @@
                     <div style="font-size:30px;color:#c19a6b;flex-shrink:0;margin-left:12px">⚔</div>
                 </div>
             </div>
+            <!-- 探险入口 -->
+            <div onclick="showAdventurePage()" class="w-full max-w-[340px] cursor-pointer active:scale-95 transition select-none" style="background:linear-gradient(135deg,#0a0f1a 0%,#101e2d 60%,#0a0f1a 100%);border-radius:20px;padding:16px 20px;border:1px solid rgba(107,154,193,0.4);position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(107,154,193,0.03) 10px,rgba(107,154,193,0.03) 20px);pointer-events:none"></div>
+                <div style="position:relative;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:12px;font-weight:700;color:rgba(107,193,154,0.6);letter-spacing:0.6em;margin-bottom:5px;text-transform:uppercase">◈ 江湖探险</div>
+                        <div style="font-size:14px;font-weight:900;color:#f5f0e8;letter-spacing:0.05em;line-height:1.3;">踏入书中，求一支命签</div>
+                    </div>
+                    <div style="font-size:28px;flex-shrink:0;margin-left:12px">🎋</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -332,6 +343,66 @@
 
     </div>
 
+    <!-- ══════════════ 江湖探险页 ══════════════ -->
+    <div id="adventure-page" class="max-w-md w-full pb-16" style="display:none;">
+
+        <!-- 顶栏 -->
+        <div style="position:sticky;top:0;z-index:50;background:#fbfaf8;border-bottom:1px solid rgba(107,154,193,0.15);padding:14px 20px;display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;">
+            <button onclick="adventureBack()" style="background:none;border:none;cursor:pointer;padding:4px 8px 4px 0;font-size:13px;font-weight:700;color:#9ca3af;font-family:inherit;letter-spacing:0.05em;flex-shrink:0">← 返回</button>
+            <div style="flex:1;text-align:center">
+                <span style="font-size:11px;font-weight:700;color:#6bc19a;letter-spacing:0.3em" id="adv-breadcrumb">◈ 选择书目 ◈</span>
+            </div>
+            <div style="width:48px"></div>
+        </div>
+
+        <!-- 子页面容器 -->
+        <div id="adv-book-select" class="px-4 pt-5 space-y-4">
+            <div style="text-align:center;padding:16px 0 8px">
+                <div style="font-size:28px;margin-bottom:8px">🎋</div>
+                <div style="font-size:17px;font-weight:900;color:#1a1a1a;letter-spacing:0.1em">踏入哪片江湖？</div>
+                <div style="font-size:11px;color:#9ca3af;margin-top:6px" id="adv-role-hint">选择一本书，抽取你的命运签</div>
+            </div>
+            <div id="adv-book-list" class="space-y-3"></div>
+        </div>
+
+        <div id="adv-scenario" class="px-4 pt-5 space-y-4" style="display:none;">
+            <div style="background:linear-gradient(135deg,#0a0f1a,#101e2d);border-radius:20px;padding:20px;border:1px solid rgba(107,154,193,0.3);">
+                <div style="font-size:9px;font-weight:700;color:rgba(107,193,154,0.6);letter-spacing:0.4em;margin-bottom:8px">◈ 江湖遭遇</div>
+                <div id="adv-scenario-text" style="font-size:14px;color:#f5f0e8;line-height:1.8;font-weight:700"></div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;text-align:center;padding:4px 0">—— 你会如何应对？ ——</div>
+            <div id="adv-choices" class="space-y-3"></div>
+        </div>
+
+        <div id="adv-result" class="px-4 pt-5 space-y-4" style="display:none;">
+            <div id="adv-result-loading" style="text-align:center;padding:40px 0;display:none;">
+                <div style="font-size:24px;margin-bottom:12px;animation:spin 2s linear infinite;display:inline-block">☯</div>
+                <div style="font-size:12px;color:#9ca3af;letter-spacing:0.2em">天机推演中……</div>
+            </div>
+            <div id="adv-result-content" style="display:none;">
+                <div style="background:linear-gradient(135deg,#0a0f1a,#101e2d);border-radius:24px;padding:24px 20px;border:1px solid rgba(107,154,193,0.3);text-align:center;">
+                    <div style="font-size:9px;font-weight:700;color:rgba(107,193,154,0.6);letter-spacing:0.4em;margin-bottom:10px">◈ 命运天签 ◈</div>
+                    <div id="adv-sign-grade" style="font-size:22px;font-weight:900;color:#f5f0e8;letter-spacing:0.2em;margin-bottom:6px"></div>
+                    <div id="adv-sign-title" style="font-size:13px;color:rgba(107,193,154,0.8);letter-spacing:0.15em;margin-bottom:16px"></div>
+                    <div style="height:1px;background:rgba(107,154,193,0.2);margin:0 20px 16px"></div>
+                    <div id="adv-sign-body" style="font-size:13px;color:#e0d8cc;line-height:1.9;text-align:left"></div>
+                </div>
+                <div style="background:white;border:1px solid #f0ede8;border-radius:20px;padding:18px 20px;">
+                    <div style="font-size:9px;font-weight:700;color:#9ca3af;letter-spacing:0.3em;margin-bottom:10px">◎ 今日宜忌</div>
+                    <div id="adv-omens" style="font-size:12px;color:#374151;line-height:1.9"></div>
+                </div>
+                <div style="display:flex;gap:10px;padding-top:4px;">
+                    <button onclick="adventureRetry()" style="flex:1;padding:13px;background:#1a1a1a;color:white;border:none;border-radius:14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.05em">再求一签</button>
+                    <button onclick="showPage('start-page')" style="flex:1;padding:13px;background:white;color:#1a1a1a;border:1px solid #e5e7eb;border-radius:14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">回首页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    </style>
+
     <!-- ══════════════ 独立评论页 ══════════════ -->
     <div id="forum-page" class="max-w-md w-full pb-12" style="display:none;">
 
@@ -358,23 +429,6 @@
             <button onclick="showPage('start-page')" style="width:100%;padding:14px;background:#962f23;color:white;border:none;border-radius:14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.1em;transition:background 0.2s">
                 先去测测我是谁 →
             </button>
-
-            <!-- 发言框 -->
-            <div style="background:white;border:1px solid #f0ede8;border-radius:16px;padding:16px;">
-                <div style="font-size:9px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;margin-bottom:10px">◎ 留下你的江湖印记</div>
-                <textarea id="fp-comment-input" placeholder="写下你的感悟……" style="width:100%;min-height:72px;border:1px solid #f0ede8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1a1a;background:#fbfaf8;resize:none;outline:none;box-sizing:border-box;line-height:1.6" maxlength="200" oninput="document.getElementById('fp-char-count').textContent=this.value.length+' / 200'"></textarea>
-                <div style="display:flex;justify-content:space-between;margin-top:4px;margin-bottom:10px">
-                    <span id="fp-char-count" style="font-size:10px;color:#d1d5db">0 / 200</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-                    <span style="font-size:10px;color:#9ca3af;flex-shrink:0">身份：</span>
-                    <button id="fp-anon-btn" onclick="fpToggleAnon(true)" style="font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0">匿名侠客</button>
-                    <button id="fp-named-btn" onclick="fpToggleAnon(false)" style="font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0">自报名号</button>
-                    <input id="fp-nickname-input" placeholder="你的江湖名号" style="display:none;flex:1;min-width:0;border:1px solid #f0ede8;border-radius:8px;padding:4px 10px;font-size:12px;font-family:inherit;outline:none;background:#fbfaf8" maxlength="20">
-                </div>
-                <button onclick="submitForumPageComment()" id="fp-submit-btn" style="width:100%;padding:11px;background:#1a1a1a;color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.05em">投入江湖</button>
-                <div id="fp-submit-msg" style="font-size:11px;text-align:center;margin-top:8px;min-height:16px;color:#962f23"></div>
-            </div>
 
             <!-- 总数 -->
             <div style="text-align:center;padding:4px 0 2px">
@@ -796,10 +850,11 @@
     //  页面切换
     // ══════════════════════════════════════════════
     function showPage(id) {
-        document.getElementById('start-page').style.display  = (id === 'start-page')  ? 'flex'  : 'none';
-        document.getElementById('quiz-page').style.display   = (id === 'quiz-page')   ? 'flex'  : 'none';
-        document.getElementById('result-page').style.display = (id === 'result-page') ? 'block' : 'none';
-        document.getElementById('forum-page').style.display  = (id === 'forum-page')  ? 'block' : 'none';
+        document.getElementById('start-page').style.display    = (id === 'start-page')    ? 'flex'  : 'none';
+        document.getElementById('quiz-page').style.display     = (id === 'quiz-page')     ? 'flex'  : 'none';
+        document.getElementById('result-page').style.display   = (id === 'result-page')   ? 'block' : 'none';
+        document.getElementById('forum-page').style.display    = (id === 'forum-page')    ? 'block' : 'none';
+        document.getElementById('adventure-page').style.display= (id === 'adventure-page')? 'block' : 'none';
         if (id !== 'result-page' && id !== 'forum-page') window.scrollTo(0, 0);
     }
 
@@ -1466,7 +1521,6 @@
         const { data, error, count } = await db
             .from('comments')
             .select('*', { count: 'exact' })
-            .is('parent_id', null)          // 只取顶层评论，回复不出现在主列表
             .order('created_at', { ascending: false })
             .range(commentOffset, commentOffset + PAGE_SIZE - 1);
 
@@ -1492,11 +1546,9 @@
         loadComments();
     }
 
-    function buildCommentCard(c, isNested) {
+    function buildCommentCard(c) {
         const wrap = document.createElement('div');
-        wrap.style.cssText = isNested
-            ? 'background:#fbfaf8;border-left:2px solid #f0ede8;border-radius:10px;padding:10px 14px;margin-top:8px'
-            : 'background:white;border:1px solid #f0ede8;border-radius:14px;padding:14px 16px;margin-bottom:10px';
+        wrap.style.cssText = 'background:white;border:1px solid #f0ede8;border-radius:14px;padding:14px 16px;margin-bottom:10px';
 
         const timeStr = formatTime(c.created_at);
         const roleTag = c.role_name ? `<span style="font-size:9px;color:#962f23;background:#fdf3f1;padding:2px 8px;border-radius:99px;margin-left:6px">${c.role_name}</span>` : '';
@@ -1510,98 +1562,13 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:8px">
                     <span style="font-size:10px;color:#d1d5db">${timeStr}</span>
-                    <button onclick="reportComment('${c.id}')" style="font-size:9px;color:#d1d5db;background:none;border:none;cursor:pointer;font-family:inherit;padding:0">举报</button>
+                    <button onclick="reportComment('${c.id}')" style="font-size:9px;color:#d1d5db;background:none;border:none;cursor:pointer;font-family:inherit;padding:0" title="举报">举报</button>
                 </div>
             </div>
             ${promptTag}
             <div style="font-size:13px;color:#374151;line-height:1.7;word-break:break-all">${escapeHtml(c.content)}</div>
-            ${isNested ? '' : `
-            <div style="margin-top:10px">
-                <div id="replies-${c.id}" style="margin-bottom:6px"></div>
-                <button onclick="toggleReplyBox('${c.id}')" style="font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;letter-spacing:0.05em">↩ 回复</button>
-                <div id="reply-box-${c.id}" style="display:none;margin-top:8px">
-                    <textarea id="reply-input-${c.id}" placeholder="回复 ${escapeHtml(c.author)}……" style="width:100%;min-height:60px;border:1px solid #f0ede8;border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;background:#fbfaf8;resize:none;outline:none;box-sizing:border-box;line-height:1.5" maxlength="200"></textarea>
-                    <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">
-                        <button onclick="replyToggleAnon('${c.id}',true)" id="reply-anon-btn-${c.id}" style="font-size:10px;padding:3px 10px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0">匿名</button>
-                        <button onclick="replyToggleAnon('${c.id}',false)" id="reply-named-btn-${c.id}" style="font-size:10px;padding:3px 10px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0">署名</button>
-                        <input id="reply-nick-${c.id}" placeholder="你的名号" style="display:none;width:90px;border:1px solid #f0ede8;border-radius:6px;padding:3px 8px;font-size:11px;font-family:inherit;outline:none;background:#fbfaf8" maxlength="20">
-                    </div>
-                    <div style="display:flex;gap:6px;margin-top:6px;align-items:center">
-                        <button onclick="submitReply('${c.id}')" style="font-size:11px;padding:5px 14px;background:#1a1a1a;color:white;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700">发送</button>
-                        <button onclick="document.getElementById('reply-box-${c.id}').style.display='none'" style="font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:inherit">取消</button>
-                        <span id="reply-msg-${c.id}" style="font-size:10px;color:#962f23"></span>
-                    </div>
-                </div>
-            </div>`}
         `;
-
-        if (!isNested) loadReplies(c.id, wrap.querySelector(`#replies-${c.id}`));
         return wrap;
-    }
-
-    function toggleReplyBox(parentId) {
-        const box = document.getElementById(`reply-box-${parentId}`);
-        box.style.display = box.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function replyToggleAnon(parentId, anon) {
-        const anonBtn  = document.getElementById(`reply-anon-btn-${parentId}`);
-        const namedBtn = document.getElementById(`reply-named-btn-${parentId}`);
-        const nickInput = document.getElementById(`reply-nick-${parentId}`);
-        anonBtn.style.background   = anon ? '#962f23' : 'white';
-        anonBtn.style.color        = anon ? 'white'   : '#6b7280';
-        anonBtn.style.borderColor  = anon ? '#962f23' : '#e5e7eb';
-        namedBtn.style.background  = anon ? 'white'   : '#962f23';
-        namedBtn.style.color       = anon ? '#6b7280' : 'white';
-        namedBtn.style.borderColor = anon ? '#e5e7eb' : '#962f23';
-        nickInput.style.display    = anon ? 'none'    : 'inline-block';
-    }
-
-    async function loadReplies(parentId, container) {
-        const db = getSupabase(); if (!db) return;
-        const { data } = await db
-            .from('comments')
-            .select('*')
-            .eq('parent_id', parentId)
-            .order('created_at', { ascending: true });
-        if (!data || !data.length) return;
-        data.forEach(r => container.appendChild(buildCommentCard(r, true)));
-    }
-
-    async function submitReply(parentId) {
-        const db = getSupabase(); if (!db) return;
-        const input   = document.getElementById(`reply-input-${parentId}`);
-        const msg     = document.getElementById(`reply-msg-${parentId}`);
-        const nickEl  = document.getElementById(`reply-nick-${parentId}`);
-        const anonBtn = document.getElementById(`reply-anon-btn-${parentId}`);
-        const isAnon  = anonBtn.style.background === 'rgb(150, 47, 35)' || anonBtn.style.background === '#962f23';
-        const text    = input.value.trim();
-
-        if (!text) { msg.textContent = '写点什么吧'; return; }
-        if (containsBannedWords(text)) { msg.textContent = '文明江湖，请修改后再发'; return; }
-
-        let author = '匿名侠客';
-        if (!isAnon) {
-            const nick = nickEl.value.trim();
-            if (!nick) { msg.textContent = '请填写名号'; return; }
-            if (containsBannedWords(nick)) { msg.textContent = '此名号不雅'; return; }
-            author = nick;
-        }
-
-        const { error } = await db.from('comments').insert({
-            parent_id: parentId,
-            role_name: currentRoleName || null,
-            author,
-            content: text,
-            is_anon: isAnon
-        });
-
-        if (error) { msg.textContent = '发送失败，稍后再试'; return; }
-
-        input.value = '';
-        document.getElementById(`reply-box-${parentId}`).style.display = 'none';
-        const container = document.getElementById(`replies-${parentId}`);
-        if (container) { container.innerHTML = ''; loadReplies(parentId, container); }
     }
 
     function escapeHtml(str) {
@@ -1658,7 +1625,6 @@
         const { data, error, count } = await db
             .from('comments')
             .select('*', { count: 'exact' })
-            .is('parent_id', null)          // 只取顶层评论
             .order('created_at', { ascending: false })
             .range(forumPageOffset, forumPageOffset + FORUM_PAGE_SIZE - 1);
 
@@ -1683,58 +1649,216 @@
         loadForumPageComments();
     }
 
-    // ── 独立布告栏页：发言 ──
-    let fpIsAnon = true;
-    function fpToggleAnon(anon) {
-        fpIsAnon = anon;
-        document.getElementById('fp-anon-btn').style.background  = anon ? '#962f23' : 'white';
-        document.getElementById('fp-anon-btn').style.color        = anon ? 'white'   : '#6b7280';
-        document.getElementById('fp-anon-btn').style.borderColor  = anon ? '#962f23' : '#e5e7eb';
-        document.getElementById('fp-named-btn').style.background  = anon ? 'white'   : '#962f23';
-        document.getElementById('fp-named-btn').style.color       = anon ? '#6b7280' : 'white';
-        document.getElementById('fp-named-btn').style.borderColor = anon ? '#e5e7eb' : '#962f23';
-        document.getElementById('fp-nickname-input').style.display = anon ? 'none' : 'block';
+    // ══════════════════════════════════════════════
+    //  江湖探险
+    // ══════════════════════════════════════════════
+
+    const ADV_BOOKS = [
+        { id:'sjxx', name:'射雕英雄传', icon:'🦅', era:'南宋',
+          scenarios:[
+            { text:'黑夜里，你独自走在沙漠边缘，忽然前方出现一团火光，隐约有人影晃动。你停下脚步，辨认着那些声音——似乎是两拨人在激烈争论，其中夹杂着刀剑碰撞声。', choices:['绕道避开，江湖恩怨不关我事','悄悄靠近，先看清再决定','大喝一声现身，以气势压住局面'] },
+            { text:'一家客栈里，邻桌的老者突然倒下，周围人皆退散，只有你还坐在原地。老者用最后力气将一个布袋塞入你手中，低声说了几个字就闭上了眼睛。', choices:['打开布袋，看看里面是什么','先把布袋藏好，叫大夫来','悄悄放下布袋离开，莫惹麻烦'] },
+            { text:'你在桃花岛外的海边捡到一本残破的书册，翻开第一页，是密密麻麻的武功心法，最后一行写着：得者须以命相护，不得转让他人。', choices:['认真研读，既然得到就是缘分','原地放回，天降横祸不敢要','带走先收着，再慢慢想清楚'] },
+          ]
+        },
+        { id:'tldl', name:'天龙八部', icon:'🐉', era:'北宋',
+          scenarios:[
+            { text:'少室山下，你遇见一个面色惨白、气若游丝的陌生人，他说自己中了奇毒，只需你帮他取来山顶寺庙里的一株药草，他便以一门绝学相赠。', choices:['答应他，帮人出手是侠义本色','婉拒，陌生人的话不可轻信','先问清楚他是谁，再做决定'] },
+            { text:'大理城内，你无意间撞破了一场秘密会面，对方发现了你，其中一人走上前来，递给你一枚玉令，说：「今日之事，你从未见过。」', choices:['收下玉令，保持沉默','拒绝并当场质问他们在做什么','假装收下，暗中记住他们的面貌'] },
+            { text:'深夜，有人翻窗进入你的房间，你惊醒后发现那是个受伤的女子，她低声求你：「他们追来了，让我躲一躲。」门外已传来脚步声。', choices:['立刻让她藏好，挡住追来的人','把人交出去，自己不惹麻烦','先问清楚她是谁，再决定帮不帮'] },
+          ]
+        },
+        { id:'xlwq', name:'笑傲江湖', icon:'🎵', era:'明代',
+          scenarios:[
+            { text:'衡山城外的路边，有人拦住你的去路，自称「采花大盗」田伯光，说要与你比试三招，输了让路，赢了——他笑而不语，眼神意味深长。', choices:['接招，输赢都是经历','绕道走，没必要趟这浑水','反问他：赢了你又能怎样'] },
+            { text:'你找到了一本据说价值连城的武学秘籍，打开一看，第一页写着：「此书习之必废，毁之不忍，传之祸人。」', choices:['烧掉，这种东西留着是祸','收起来，找个安全的地方封存','偷偷研究一下再说'] },
+            { text:'华山派师兄弟之间暗生嫌隙，你站在中间，两边都来找你表态，谁也不愿先退一步。', choices:['明确站在自己认为对的那边','两边都劝，努力做和事佬','暂时保持中立，等局势明朗再说'] },
+          ]
+        },
+        { id:'yjlc', name:'倚天屠龙记', icon:'⚔️', era:'元末',
+          scenarios:[
+            { text:'光明顶密道中，你独自走在幽暗的石道里，忽然脚踩到了什么东西。低头一看，是一枚刻有"明"字的令牌，旁边还有一滩未干的血迹。', choices:['拿起令牌，这或许是条线索','原地放下，装作没看见','拿起来但先藏好，不声张'] },
+            { text:'少林寺门口，一个自称是你远房亲戚的人突然出现，说家中有急事需要你帮忙，但他的眼神让你觉得哪里不对。', choices:['跟他走，先看看再说','直接拒绝，陌生人不可信','假装答应，暗中提高警惕'] },
+            { text:'你意外得到了屠龙刀，但当天夜里，分别有三波人来到你门前，都说这把刀本属于他们。', choices:['当场把刀熔掉，以绝后患','只见其中一人，把情况问清楚','闭门不见任何人，等天亮再说'] },
+          ]
+        },
+        { id:'ldhc', name:'鹿鼎记', icon:'🎲', era:'清代',
+          scenarios:[
+            { text:'紫禁城御膳房里，你撞见一个太监正在往皇帝的膳食里加东西，他发现你后，掏出一锭黄金放到你手上，冲你眨了眨眼。', choices:['收下黄金，装作没看见','把黄金扔还给他并喝止他','假装收下，然后悄悄去告发'] },
+            { text:'韦小宝式的考验降临了：你同时收到了两个秘密组织的入伙邀请，一个权势滔天，一个人情味浓。两边都说必须今晚给答复。', choices:['加入权势那边，现实一点','加入人情味那边，跟对了人才重要','两边都加，左右逢源看情况'] },
+            { text:'你在扬州书市偶遇一个书生，他声称自己写了一本记录当朝秘辛的手稿，要以五两银子卖给你，说此书日后「价值连城」。', choices:['买下来，兴许真是好东西','拒绝，这种书太烫手','讨价还价，先看内容再定'] },
+          ]
+        },
+    ];
+
+    let advCurrentBook = null;
+    let advCurrentScenario = null;
+    let advCurrentChoice = null;
+
+    function showAdventurePage() {
+        showPage('adventure-page');
+        window.scrollTo(0, 0);
+        // 重置到选书状态
+        advShowBookSelect();
     }
 
-    async function submitForumPageComment() {
-        const db = getSupabase(); if (!db) return;
-        const btn  = document.getElementById('fp-submit-btn');
-        const msg  = document.getElementById('fp-submit-msg');
-        const text = document.getElementById('fp-comment-input').value.trim();
+    function adventureBack() {
+        const scenarioVisible = document.getElementById('adv-scenario').style.display !== 'none';
+        const resultVisible   = document.getElementById('adv-result').style.display   !== 'none';
+        if (resultVisible)   { advShowScenario(advCurrentBook, advCurrentScenario); return; }
+        if (scenarioVisible) { advShowBookSelect(); return; }
+        showPage('start-page');
+    }
 
-        if (!text) { msg.textContent = '说点什么吧，侠客'; return; }
-        if (text.length < 3) { msg.textContent = '再多说两个字'; return; }
-        if (containsBannedWords(text)) { msg.textContent = '江湖有公约，请文明论道'; return; }
+    function advShowBookSelect() {
+        document.getElementById('adv-book-select').style.display = 'block';
+        document.getElementById('adv-scenario').style.display    = 'none';
+        document.getElementById('adv-result').style.display      = 'none';
+        document.getElementById('adv-breadcrumb').textContent    = '◈ 选择书目 ◈';
 
-        let author = '匿名侠客';
-        if (!fpIsAnon) {
-            const nick = document.getElementById('fp-nickname-input').value.trim();
-            if (!nick) { msg.textContent = '请填写你的江湖名号'; return; }
-            if (nick.length > 20) { msg.textContent = '名号太长'; return; }
-            if (containsBannedWords(nick)) { msg.textContent = '此名号不雅，请另取'; return; }
-            author = nick;
+        // 提示已测用户
+        const role = currentBestMatch ? currentBestMatch.name : null;
+        document.getElementById('adv-role-hint').textContent = role
+            ? `以「${role}」的身份踏入江湖，命签将为你专属解读`
+            : '选择一本书，抽取你的命运签';
+
+        const list = document.getElementById('adv-book-list');
+        list.innerHTML = '';
+        ADV_BOOKS.forEach(book => {
+            const btn = document.createElement('div');
+            btn.style.cssText = 'background:white;border:1px solid #f0ede8;border-radius:16px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color 0.2s;';
+            btn.innerHTML = `
+                <div style="font-size:26px;flex-shrink:0">${book.icon}</div>
+                <div>
+                    <div style="font-size:14px;font-weight:900;color:#1a1a1a;letter-spacing:0.05em">${book.name}</div>
+                    <div style="font-size:10px;color:#9ca3af;margin-top:3px;letter-spacing:0.15em">${book.era} · ${book.scenarios.length} 个遭遇场景</div>
+                </div>
+                <div style="margin-left:auto;font-size:12px;color:#d1d5db">→</div>
+            `;
+            btn.onclick = () => {
+                const idx = Math.floor(Math.random() * book.scenarios.length);
+                advShowScenario(book, idx);
+            };
+            btn.onmouseover = () => btn.style.borderColor = '#6bc19a';
+            btn.onmouseout  = () => btn.style.borderColor = '#f0ede8';
+            list.appendChild(btn);
+        });
+    }
+
+    function advShowScenario(book, scenarioIdx) {
+        advCurrentBook     = book;
+        advCurrentScenario = scenarioIdx;
+        advCurrentChoice   = null;
+        const s = book.scenarios[scenarioIdx];
+
+        document.getElementById('adv-book-select').style.display = 'none';
+        document.getElementById('adv-result').style.display      = 'none';
+        document.getElementById('adv-scenario').style.display    = 'block';
+        document.getElementById('adv-breadcrumb').textContent    = `◈ ${book.name} ◈`;
+        document.getElementById('adv-scenario-text').textContent = s.text;
+        window.scrollTo(0, 0);
+
+        const choicesDiv = document.getElementById('adv-choices');
+        choicesDiv.innerHTML = '';
+        s.choices.forEach((c, i) => {
+            const btn = document.createElement('button');
+            btn.style.cssText = 'width:100%;background:white;border:1px solid #e5e7eb;border-radius:14px;padding:14px 16px;text-align:left;font-size:13px;font-family:inherit;color:#374151;cursor:pointer;line-height:1.6;transition:all 0.15s;';
+            btn.innerHTML = `<span style="color:#6bc19a;font-weight:700;margin-right:8px">${['①','②','③'][i]}</span>${c}`;
+            btn.onclick = () => advSelectChoice(i, c, btn);
+            btn.onmouseover = () => { btn.style.borderColor = '#6bc19a'; btn.style.background = '#f0faf5'; };
+            btn.onmouseout  = () => {
+                if (advCurrentChoice !== i) { btn.style.borderColor = '#e5e7eb'; btn.style.background = 'white'; }
+            };
+            choicesDiv.appendChild(btn);
+        });
+    }
+
+    function advSelectChoice(idx, choiceText, btn) {
+        advCurrentChoice = idx;
+        // 高亮选中
+        document.querySelectorAll('#adv-choices button').forEach((b, i) => {
+            b.style.borderColor = i === idx ? '#6bc19a' : '#e5e7eb';
+            b.style.background  = i === idx ? '#f0faf5' : 'white';
+        });
+        // 短暂延迟后进入结果
+        setTimeout(() => advShowResult(choiceText), 400);
+    }
+
+    async function advShowResult(choiceText) {
+        document.getElementById('adv-scenario').style.display    = 'none';
+        document.getElementById('adv-result').style.display      = 'block';
+        document.getElementById('adv-result-loading').style.display = 'block';
+        document.getElementById('adv-result-content').style.display = 'none';
+        window.scrollTo(0, 0);
+
+        const book     = advCurrentBook;
+        const scenario = book.scenarios[advCurrentScenario];
+        const role     = currentBestMatch ? currentBestMatch.name : null;
+        const roleDesc = currentBestMatch ? currentBestMatch.profile : null;
+
+        const roleContext = role
+            ? `用户的江湖原型是「${role}」，其性格特点：${roleDesc}`
+            : '用户尚未测试，以普通侠客身份求签';
+
+        const prompt = `你是一位深谙金庸武侠世界的算命先生，精通《${book.name}》。
+用户正在进行江湖探险求签。
+
+背景：${roleContext}
+
+遭遇场景：${scenario.text}
+
+用户的选择：${choiceText}
+
+请根据用户的性格原型和他的选择，生成一份江湖命签，严格按以下 JSON 格式返回，不要有任何多余文字：
+{
+  "grade": "上签/中签/下签",
+  "title": "四字签名（如「柳暗花明」「山穷水尽」）",
+  "body": "三到四句话，用文言感的现代文，结合《${book.name}》里的人物或情节，解读用户这次选择所映射的命运走向，要有具体的江湖意象，不要空泛",
+  "yi": "今日宜：一件具体的事（10字内）",
+  "ji": "今日忌：一件具体的事（10字内）",
+  "tip": "一句点睛的话给用户，结合他的江湖原型性格，10到20字"
+}`;
+
+        try {
+            const res = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 1000,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+            const data = await res.json();
+            const text = data.content.map(b => b.text || '').join('').replace(/```json|```/g,'').trim();
+            const json = JSON.parse(text);
+
+            document.getElementById('adv-sign-grade').textContent = json.grade || '中签';
+            document.getElementById('adv-sign-title').textContent = json.title || '';
+            document.getElementById('adv-sign-body').textContent  = json.body  || '';
+            document.getElementById('adv-omens').innerHTML =
+                `<div style="margin-bottom:6px">🌿 宜：${json.yi || '—'}</div>` +
+                `<div style="margin-bottom:10px">🚫 忌：${json.ji || '—'}</div>` +
+                `<div style="color:#962f23;font-weight:700;font-size:12px;border-top:1px solid #f0ede8;padding-top:10px">⚔ ${json.tip || '—'}</div>`;
+
+            // 签文颜色
+            const gradeColor = { '上签':'#6bc19a', '中签':'#c19a6b', '下签':'#c16b6b' };
+            document.getElementById('adv-sign-grade').style.color = gradeColor[json.grade] || '#c19a6b';
+
+        } catch(e) {
+            document.getElementById('adv-sign-body').textContent = '天机难测，命数未明。此次求签有误，请稍后再试。';
         }
 
-        btn.disabled = true; btn.textContent = '传书中……';
-        const { error } = await db.from('comments').insert({
-            role_name: null,
-            author,
-            content: text,
-            is_anon: fpIsAnon
-        });
-        btn.disabled = false; btn.textContent = '投入江湖';
+        document.getElementById('adv-result-loading').style.display = 'none';
+        document.getElementById('adv-result-content').style.display = 'block';
+    }
 
-        if (error) { msg.textContent = '传书失败，稍后再试'; return; }
+    function adventureRetry() {
+        // 同一本书，随机换一个场景
+        const idx = Math.floor(Math.random() * advCurrentBook.scenarios.length);
+        advShowScenario(advCurrentBook, idx);
+    }
 
-        document.getElementById('fp-comment-input').value = '';
-        document.getElementById('fp-char-count').textContent = '0 / 200';
-        msg.style.color = '#2a6b3f';
-        msg.textContent = '✓ 你的印记已留入江湖';
-        setTimeout(() => { msg.textContent = ''; msg.style.color = '#962f23'; }, 3000);
-
-        forumPageOffset = 0;
-        document.getElementById('forum-page-comments-list').innerHTML = '';
-        await loadForumPageComments();
-    }</script>
+    </script>
 </body>
 </html>
