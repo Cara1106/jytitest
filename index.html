@@ -86,6 +86,16 @@
         .centered-container { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
         #quiz-page { min-height: 100vh; flex-direction: column; justify-content: center; }
         .role-image { width: 180px; height: 180px; object-fit: contain; margin-bottom: 1rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); }
+        #result-page > * + * { margin-top: 12px !important; }
+        #result-page > .bg-white,
+        #result-page > .bg-parchment,
+        #result-page > .grid.grid-cols-2.gap-3 > .bg-white {
+            border-radius: 18px !important;
+        }
+        #result-page .chart-wrap { height: 210px; }
+        #role-rarity { margin-bottom: 12px !important; }
+        #role-tag { margin-bottom: 12px !important; }
+        #forum-section > * + * { margin-top: 10px !important; }
 
         /* ── 独立评论页顶栏 ── */
         #forum-page-header {
@@ -154,6 +164,29 @@
             #start-page [onclick="showAdventurePage()"] div[style*="font-size:28px"] {
                 font-size: 22px !important;
             }
+            #result-page {
+                padding-top: 16px !important;
+                padding-bottom: 28px !important;
+            }
+            #result-page > * + * { margin-top: 10px !important; }
+            #result-page > .bg-white,
+            #result-page > .bg-parchment,
+            #result-page > .grid.grid-cols-2.gap-3 > .bg-white {
+                padding: 16px 18px !important;
+                border-radius: 16px !important;
+            }
+            #result-page > .grid.grid-cols-2.gap-3 > .bg-white {
+                padding: 14px 12px !important;
+            }
+            #result-page .chart-wrap { height: 190px; }
+            .role-image {
+                width: 138px !important;
+                height: 138px !important;
+                margin-bottom: 8px !important;
+            }
+            #role-name { font-size: 38px !important; }
+            #role-desc,
+            #role-advice { line-height: 1.75 !important; }
         }
     </style>
 </head>
@@ -163,8 +196,8 @@
     <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
 
     <!-- ══════════════ 开始页 ══════════════ -->
-    <div id="start-page" class="max-w-2xl w-full text-center space-y-8 py-16 px-6 flex flex-col justify-center min-h-screen" style="display:flex;">
-        <div class="space-y-6 flex flex-col items-center">
+    <div id="start-page" class="max-w-2xl w-full text-center space-y-5 py-12 px-6 flex flex-col justify-center min-h-screen" style="display:flex;">
+        <div class="space-y-4 flex flex-col items-center">
             <h1 class="text-7xl md:text-9xl font-[900] text-ink tracking-[0.2em] leading-none mb-2">JYTI</h1>
             <div class="h-px w-24 bg-gold opacity-30"></div>
             <p class="text-lg md:text-xl font-bold text-gold tracking-[0.25em] whitespace-nowrap opacity-80 uppercase italic">SBTI已经过时，江湖才是唯一的底色</p>
@@ -189,9 +222,9 @@
             </div>
         </div>
 
-        <div class="space-y-8 flex flex-col items-center pt-4">
+        <div class="space-y-5 flex flex-col items-center pt-2">
             <h2 class="text-2xl md:text-3xl font-black text-ink tracking-[0.15em]">寻 找 你 的 江 湖 原 型</h2>
-            <div class="w-full max-w-[340px] space-y-6">
+            <div class="w-full max-w-[340px] space-y-3">
                 <p class="text-[12px] font-bold text-vermilion tracking-[0.4em] uppercase opacity-70">—— 请选择你的江湖性别 ——</p>
                 <div class="grid grid-cols-2 gap-4 w-full">
                     <button onclick="selectGender('M')" class="py-5 bg-ink text-white rounded-2xl font-bold hover:bg-vermilion shadow-lg active:scale-95 transition text-lg">男 侠</button>
@@ -500,6 +533,28 @@
             <!-- 总数 -->
             <div style="text-align:center;padding:4px 0 2px">
                 <span style="font-size:11px;color:#9ca3af">与 <span id="forum-page-total-count" style="color:#962f23;font-weight:700">—</span> 位侠客共聚于此</span>
+            </div>
+
+            <!-- 发言框 -->
+            <div style="background:white;border:1px solid #f0ede8;border-radius:16px;padding:16px;">
+                <div style="font-size:9px;font-weight:700;color:#9ca3af;letter-spacing:0.2em;margin-bottom:10px">◎ 留下你的江湖印记</div>
+                <textarea id="forum-comment-input" placeholder="写下你的感悟……" style="width:100%;min-height:80px;border:1px solid #f0ede8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1a1a;background:#fbfaf8;resize:none;outline:none;box-sizing:border-box;line-height:1.6" maxlength="200" oninput="updateForumCharCount(this)"></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;margin-bottom:12px">
+                    <span id="forum-char-count" style="font-size:10px;color:#d1d5db">0 / 200</span>
+                    <span style="font-size:10px;color:#d1d5db">文明江湖，感谢守护</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+                    <span style="font-size:10px;color:#9ca3af;flex-shrink:0">以何人身份现身：</span>
+                    <div style="display:flex;align-items:center;gap:6px;flex:1">
+                        <button id="forum-anon-btn" onclick="toggleForumAnon(true)" style="font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0">匿名侠客</button>
+                        <button id="forum-named-btn" onclick="toggleForumAnon(false)" style="font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0">自报名号</button>
+                        <input id="forum-nickname-input" placeholder="你的江湖名号" style="display:none;flex:1;min-width:0;border:1px solid #f0ede8;border-radius:8px;padding:4px 10px;font-size:12px;font-family:inherit;outline:none;background:#fbfaf8" maxlength="20">
+                    </div>
+                </div>
+                <button onclick="submitForumComment()" id="forum-submit-btn" style="width:100%;padding:12px;background:#1a1a1a;color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.05em;transition:background 0.2s">
+                    投入江湖
+                </button>
+                <div id="forum-submit-msg" style="font-size:11px;text-align:center;margin-top:8px;min-height:16px;color:#962f23"></div>
             </div>
 
             <!-- 评论列表 -->
@@ -1466,8 +1521,11 @@
     const PAGE_SIZE = 8;
     let commentOffset = 0;
     let isAnon = true;
+    let forumIsAnon = true;
+    const replyIdentity = {};
     let selectedPromptText = '';
     let currentRoleName = '';
+    let commentsSupportReplies = true;
 
     // 违禁词列表（前端初筛，后端 RLS 是第二道防线）
     const BANNED_WORDS = [
@@ -1480,9 +1538,55 @@
         return BANNED_WORDS.some(w => lower.includes(w));
     }
 
+    function isMissingParentColumn(error) {
+        const msg = ((error && (error.message || error.details || error.hint)) || '').toLowerCase();
+        return msg.includes('parent_id') || msg.includes('schema cache');
+    }
+
+    function getCurrentAuthor(msgEl) {
+        let author = '匿名侠客';
+        if (!isAnon) {
+            const nick = document.getElementById('nickname-input').value.trim();
+            if (!nick) { msgEl.textContent = '请填写你的江湖名号'; return null; }
+            if (nick.length > 20) { msgEl.textContent = '名号太长，江湖人记不住'; return null; }
+            if (containsBannedWords(nick)) { msgEl.textContent = '此名号不雅，请另取'; return null; }
+            author = nick;
+        }
+        return author;
+    }
+
+    function getForumAuthor(msgEl) {
+        let author = '匿名侠客';
+        if (!forumIsAnon) {
+            const nick = document.getElementById('forum-nickname-input').value.trim();
+            if (!nick) { msgEl.textContent = '请填写你的江湖名号'; return null; }
+            if (nick.length > 20) { msgEl.textContent = '名号太长，江湖人记不住'; return null; }
+            if (containsBannedWords(nick)) { msgEl.textContent = '此名号不雅，请另取'; return null; }
+            author = nick;
+        }
+        return author;
+    }
+
+    function getReplyAuthor(context, parentId, msgEl) {
+        const key = `${context}-${parentId}`;
+        const state = replyIdentity[key] || { isAnon: true };
+        if (state.isAnon) return '匿名侠客';
+
+        const input = document.getElementById(`reply-nickname-${context}-${parentId}`);
+        const nick = input ? input.value.trim() : '';
+        if (!nick) { msgEl.textContent = '请填写你的江湖名号'; return null; }
+        if (nick.length > 20) { msgEl.textContent = '名号太长，江湖人记不住'; return null; }
+        if (containsBannedWords(nick)) { msgEl.textContent = '此名号不雅，请另取'; return null; }
+        return nick;
+    }
+
     // ── UI 辅助 ──
     function updateCharCount(el) {
         document.getElementById('char-count').textContent = el.value.length + ' / 200';
+    }
+
+    function updateForumCharCount(el) {
+        document.getElementById('forum-char-count').textContent = el.value.length + ' / 200';
     }
 
     function scrollToForum() {
@@ -1501,6 +1605,42 @@
         } else {
             namedBtn.style.cssText = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0';
             anonBtn.style.cssText  = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0';
+            nickInput.style.display = 'block';
+            nickInput.focus();
+        }
+    }
+
+    function toggleForumAnon(anon) {
+        forumIsAnon = anon;
+        const anonBtn  = document.getElementById('forum-anon-btn');
+        const namedBtn = document.getElementById('forum-named-btn');
+        const nickInput = document.getElementById('forum-nickname-input');
+        if (anon) {
+            anonBtn.style.cssText  = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0';
+            namedBtn.style.cssText = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0';
+            nickInput.style.display = 'none';
+        } else {
+            namedBtn.style.cssText = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0';
+            anonBtn.style.cssText  = 'font-size:10px;padding:4px 12px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0';
+            nickInput.style.display = 'block';
+            nickInput.focus();
+        }
+    }
+
+    function toggleReplyAnon(context, parentId, anon) {
+        const key = `${context}-${parentId}`;
+        replyIdentity[key] = { isAnon: anon };
+        const anonBtn = document.getElementById(`reply-anon-${context}-${parentId}`);
+        const namedBtn = document.getElementById(`reply-named-${context}-${parentId}`);
+        const nickInput = document.getElementById(`reply-nickname-${context}-${parentId}`);
+        if (!anonBtn || !namedBtn || !nickInput) return;
+        if (anon) {
+            anonBtn.style.cssText = 'font-size:10px;padding:3px 10px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0';
+            namedBtn.style.cssText = 'font-size:10px;padding:3px 10px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0';
+            nickInput.style.display = 'none';
+        } else {
+            namedBtn.style.cssText = 'font-size:10px;padding:3px 10px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0';
+            anonBtn.style.cssText = 'font-size:10px;padding:3px 10px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0';
             nickInput.style.display = 'block';
             nickInput.focus();
         }
@@ -1539,14 +1679,8 @@
             return;
         }
 
-        let author = '匿名侠客';
-        if (!isAnon) {
-            const nick = document.getElementById('nickname-input').value.trim();
-            if (!nick) { msgEl.textContent = '请填写你的江湖名号'; return; }
-            if (nick.length > 20) { msgEl.textContent = '名号太长，江湖人记不住'; return; }
-            if (containsBannedWords(nick)) { msgEl.textContent = '此名号不雅，请另取'; return; }
-            author = nick;
-        }
+        const author = getCurrentAuthor(msgEl);
+        if (!author) return;
 
         btn.disabled = true;
         btn.textContent = '传书中……';
@@ -1582,14 +1716,75 @@
         await loadComments();
     }
 
+    async function submitForumComment() {
+        const db = getSupabase(); if (!db) return;
+        const btn = document.getElementById('forum-submit-btn');
+        const msgEl = document.getElementById('forum-submit-msg');
+        const textarea = document.getElementById('forum-comment-input');
+        const text = textarea.value.trim();
+
+        if (!text) { msgEl.textContent = '说点什么吧，侠客'; return; }
+        if (text.length < 3) { msgEl.textContent = '再多说两个字'; return; }
+        if (containsBannedWords(text)) {
+            msgEl.textContent = '江湖有公约，请文明论道';
+            return;
+        }
+
+        const author = getForumAuthor(msgEl);
+        if (!author) return;
+
+        btn.disabled = true;
+        btn.textContent = '传书中……';
+        msgEl.textContent = '';
+
+        const { error } = await db.from('comments').insert({
+            role_name: currentRoleName || null,
+            author,
+            content: text,
+            prompt: null,
+            is_anon: forumIsAnon
+        });
+
+        btn.disabled = false;
+        btn.textContent = '投入江湖';
+
+        if (error) {
+            msgEl.textContent = '传书失败，稍后再试';
+            return;
+        }
+
+        textarea.value = '';
+        document.getElementById('forum-char-count').textContent = '0 / 200';
+        msgEl.style.color = '#2a6b3f';
+        msgEl.textContent = '✓ 你的印记已留入江湖';
+        setTimeout(() => { msgEl.textContent = ''; msgEl.style.color = '#962f23'; }, 3000);
+
+        forumPageOffset = 0;
+        document.getElementById('forum-page-comments-list').innerHTML = '';
+        document.getElementById('forum-page-load-more-wrap').style.display = 'none';
+        await loadForumPageComments();
+    }
+
     // ── 加载评论 ──
     async function loadComments() {
         const db = getSupabase(); if (!db) return;
-        const { data, error, count } = await db
+        let query = db
             .from('comments')
             .select('*', { count: 'exact' })
-            .order('created_at', { ascending: false })
-            .range(commentOffset, commentOffset + PAGE_SIZE - 1);
+            .order('created_at', { ascending: false });
+
+        if (commentsSupportReplies) query = query.is('parent_id', null);
+
+        let { data, error, count } = await query.range(commentOffset, commentOffset + PAGE_SIZE - 1);
+
+        if (error && commentsSupportReplies && isMissingParentColumn(error)) {
+            commentsSupportReplies = false;
+            ({ data, error, count } = await db
+                .from('comments')
+                .select('*', { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(commentOffset, commentOffset + PAGE_SIZE - 1));
+        }
 
         if (error || !data) return;
 
@@ -1599,8 +1794,9 @@
         }
 
         const list = document.getElementById('comments-list');
+        const repliesByParent = await loadRepliesForParents(data);
         data.forEach(c => {
-            const el = buildCommentCard(c);
+            const el = buildCommentCard(c, repliesByParent[c.id] || [], 'result');
             list.appendChild(el);
         });
 
@@ -1613,13 +1809,56 @@
         loadComments();
     }
 
-    function buildCommentCard(c) {
+    async function loadRepliesForParents(parents) {
+        if (!commentsSupportReplies || !parents.length) return {};
+        const db = getSupabase(); if (!db) return {};
+        const ids = parents.map(c => c.id);
+        const { data, error } = await db
+            .from('comments')
+            .select('*')
+            .in('parent_id', ids)
+            .order('created_at', { ascending: true });
+
+        if (error) {
+            if (isMissingParentColumn(error)) commentsSupportReplies = false;
+            return {};
+        }
+
+        return (data || []).reduce((map, item) => {
+            const key = item.parent_id;
+            if (!map[key]) map[key] = [];
+            map[key].push(item);
+            return map;
+        }, {});
+    }
+
+    function buildReplyCard(r) {
+        const timeStr = formatTime(r.created_at);
+        const roleTag = r.role_name ? `<span style="font-size:8px;color:#962f23;background:#fff;padding:1px 6px;border-radius:99px;margin-left:4px">${escapeHtml(r.role_name)}</span>` : '';
+        return `
+            <div style="border-left:2px solid #eadfd6;padding:9px 0 9px 10px;margin-top:8px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px">
+                    <div style="display:flex;align-items:center;flex-wrap:wrap">
+                        <span style="font-size:11px;font-weight:700;color:#1a1a1a">${escapeHtml(r.author)}</span>
+                        ${roleTag}
+                    </div>
+                    <span style="font-size:9px;color:#c4b8ad;flex-shrink:0">${timeStr}</span>
+                </div>
+                <div style="font-size:12px;color:#4b5563;line-height:1.65;word-break:break-all">${escapeHtml(r.content)}</div>
+            </div>
+        `;
+    }
+
+    function buildCommentCard(c, replies = [], context = 'result') {
         const wrap = document.createElement('div');
         wrap.style.cssText = 'background:white;border:1px solid #f0ede8;border-radius:14px;padding:14px 16px;margin-bottom:10px';
 
         const timeStr = formatTime(c.created_at);
-        const roleTag = c.role_name ? `<span style="font-size:9px;color:#962f23;background:#fdf3f1;padding:2px 8px;border-radius:99px;margin-left:6px">${c.role_name}</span>` : '';
-        const promptTag = c.prompt ? `<div style="font-size:10px;color:#9ca3af;margin-bottom:6px;font-style:italic"># ${c.prompt.slice(0,20)}…</div>` : '';
+        const roleTag = c.role_name ? `<span style="font-size:9px;color:#962f23;background:#fdf3f1;padding:2px 8px;border-radius:99px;margin-left:6px">${escapeHtml(c.role_name)}</span>` : '';
+        const promptTag = c.prompt ? `<div style="font-size:10px;color:#9ca3af;margin-bottom:6px;font-style:italic"># ${escapeHtml(c.prompt.slice(0,20))}…</div>` : '';
+        const replyList = replies.length
+            ? `<div style="background:#fbfaf8;border-radius:12px;padding:2px 12px;margin-top:10px">${replies.map(buildReplyCard).join('')}</div>`
+            : '';
 
         wrap.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
@@ -1634,8 +1873,105 @@
             </div>
             ${promptTag}
             <div style="font-size:13px;color:#374151;line-height:1.7;word-break:break-all">${escapeHtml(c.content)}</div>
+            <div style="display:flex;align-items:center;gap:14px;margin-top:10px">
+                <button onclick="toggleReplyBox('${c.id}', '${context}')" style="font-size:10px;color:#962f23;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;font-weight:700">回复</button>
+                ${replies.length ? `<span style="font-size:10px;color:#c4b8ad">${replies.length} 条回复</span>` : ''}
+            </div>
+            ${replyList}
+            <div id="reply-box-${context}-${c.id}" style="display:none;background:#fbfaf8;border:1px solid #f0ede8;border-radius:12px;padding:10px;margin-top:10px">
+                <textarea id="reply-input-${context}-${c.id}" placeholder="回复 ${escapeHtml(c.author)}……" style="width:100%;min-height:58px;border:1px solid #eadfd6;border-radius:10px;padding:8px 10px;font-size:12px;font-family:inherit;color:#1a1a1a;background:white;resize:none;outline:none;box-sizing:border-box;line-height:1.6" maxlength="160"></textarea>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap">
+                    <span style="font-size:10px;color:#9ca3af;flex-shrink:0">以何人身份回复：</span>
+                    <button id="reply-anon-${context}-${c.id}" onclick="toggleReplyAnon('${context}', '${c.id}', true)" style="font-size:10px;padding:3px 10px;border-radius:99px;border:1px solid #962f23;background:#962f23;color:white;cursor:pointer;flex-shrink:0">匿名侠客</button>
+                    <button id="reply-named-${context}-${c.id}" onclick="toggleReplyAnon('${context}', '${c.id}', false)" style="font-size:10px;padding:3px 10px;border-radius:99px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer;flex-shrink:0">自报名号</button>
+                    <input id="reply-nickname-${context}-${c.id}" placeholder="你的江湖名号" style="display:none;flex:1;min-width:110px;border:1px solid #f0ede8;border-radius:8px;padding:4px 9px;font-size:12px;font-family:inherit;outline:none;background:white" maxlength="20">
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                    <span id="reply-msg-${context}-${c.id}" style="font-size:10px;color:#962f23;min-height:14px"></span>
+                    <div style="display:flex;gap:8px">
+                        <button onclick="toggleReplyBox('${c.id}', '${context}', true)" style="font-size:10px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 6px">取消</button>
+                        <button id="reply-btn-${context}-${c.id}" onclick="submitReply('${c.id}', '${context}', '${escapeHtml(c.role_name || '')}')" style="font-size:10px;color:white;background:#1a1a1a;border:none;border-radius:999px;cursor:pointer;font-family:inherit;padding:5px 12px;font-weight:700">传书</button>
+                    </div>
+                </div>
+            </div>
         `;
         return wrap;
+    }
+
+    function toggleReplyBox(id, context = 'result', closeOnly = false) {
+        const box = document.getElementById(`reply-box-${context}-${id}`);
+        if (!box) return;
+        if (closeOnly) {
+            box.style.display = 'none';
+            return;
+        }
+        const nextDisplay = box.style.display === 'none' ? 'block' : 'none';
+        document.querySelectorAll(`[id^="reply-box-${context}-"]`).forEach(el => { el.style.display = 'none'; });
+        box.style.display = nextDisplay;
+        if (nextDisplay === 'block') {
+            const input = document.getElementById(`reply-input-${context}-${id}`);
+            if (input) input.focus();
+        }
+    }
+
+    async function submitReply(parentId, context = 'result', parentRoleName = '') {
+        const db = getSupabase(); if (!db) return;
+        const input = document.getElementById(`reply-input-${context}-${parentId}`);
+        const msgEl = document.getElementById(`reply-msg-${context}-${parentId}`);
+        const btn = document.getElementById(`reply-btn-${context}-${parentId}`);
+        const text = input ? input.value.trim() : '';
+
+        if (!commentsSupportReplies) {
+            msgEl.textContent = '当前评论表缺少 parent_id 字段';
+            return;
+        }
+        if (!text) { msgEl.textContent = '说点什么再回复'; return; }
+        if (text.length < 2) { msgEl.textContent = '再多说两个字'; return; }
+        if (containsBannedWords(text)) { msgEl.textContent = '江湖有公约，请文明论道'; return; }
+
+        const author = getReplyAuthor(context, parentId, msgEl);
+        if (!author) return;
+
+        btn.disabled = true;
+        btn.textContent = '传书中';
+        msgEl.textContent = '';
+
+        const { error } = await db.from('comments').insert({
+            parent_id: parentId,
+            role_name: currentRoleName || parentRoleName || null,
+            author,
+            content: text,
+            prompt: null,
+            is_anon: (replyIdentity[`${context}-${parentId}`] || { isAnon: true }).isAnon
+        });
+
+        btn.disabled = false;
+        btn.textContent = '传书';
+
+        if (error) {
+            if (isMissingParentColumn(error)) {
+                commentsSupportReplies = false;
+                msgEl.textContent = '评论表缺少 parent_id 字段';
+            } else {
+                msgEl.textContent = '回复失败，稍后再试';
+            }
+            return;
+        }
+
+        input.value = '';
+        msgEl.style.color = '#2a6b3f';
+        msgEl.textContent = '✓ 已回复';
+        if (context === 'forum') {
+            forumPageOffset = 0;
+            document.getElementById('forum-page-comments-list').innerHTML = '';
+            document.getElementById('forum-page-load-more-wrap').style.display = 'none';
+            await loadForumPageComments();
+        } else {
+            commentOffset = 0;
+            document.getElementById('comments-list').innerHTML = '';
+            document.getElementById('load-more-wrap').style.display = 'none';
+            await loadComments();
+        }
     }
 
     function escapeHtml(str) {
@@ -1689,11 +2025,23 @@
 
     async function loadForumPageComments() {
         const db = getSupabase(); if (!db) return;
-        const { data, error, count } = await db
+        let query = db
             .from('comments')
             .select('*', { count: 'exact' })
-            .order('created_at', { ascending: false })
-            .range(forumPageOffset, forumPageOffset + FORUM_PAGE_SIZE - 1);
+            .order('created_at', { ascending: false });
+
+        if (commentsSupportReplies) query = query.is('parent_id', null);
+
+        let { data, error, count } = await query.range(forumPageOffset, forumPageOffset + FORUM_PAGE_SIZE - 1);
+
+        if (error && commentsSupportReplies && isMissingParentColumn(error)) {
+            commentsSupportReplies = false;
+            ({ data, error, count } = await db
+                .from('comments')
+                .select('*', { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(forumPageOffset, forumPageOffset + FORUM_PAGE_SIZE - 1));
+        }
 
         if (error || !data) return;
 
@@ -1702,8 +2050,9 @@
         }
 
         const list = document.getElementById('forum-page-comments-list');
+        const repliesByParent = await loadRepliesForParents(data);
         data.forEach(c => {
-            const el = buildCommentCard(c);
+            const el = buildCommentCard(c, repliesByParent[c.id] || [], 'forum');
             list.appendChild(el);
         });
 
@@ -1859,11 +2208,15 @@
 
     function getChoiceGrade(choiceText) {
         const text = choiceText || '';
-        const upperHints = ['帮', '救', '喝止', '告发', '烧掉', '问清楚', '劝', '安全', '看清', '警惕', '以绝后患'];
-        const lowerHints = ['装作没看见', '不惹麻烦', '收下黄金', '偷偷研究', '左右逢源', '加入权势', '保持沉默'];
+        const upperHints = ['帮', '救', '喝止', '告发', '烧掉', '问清楚', '劝', '安全', '看清', '警惕', '以绝后患', '大喝'];
+        const lowerHints = ['装作没看见', '不惹麻烦', '收下黄金', '偷偷研究', '左右逢源', '加入权势', '保持沉默', '绕道避开', '不关我事'];
         if (lowerHints.some(w => text.includes(w))) return '下签';
         if (upperHints.some(w => text.includes(w))) return '上签';
         return '中签';
+    }
+
+    function seededPick(list, seed, offset = 0) {
+        return list[Math.abs(seed + offset) % list.length];
     }
 
     function buildLocalSign(book, scenario, choiceText) {
@@ -1871,6 +2224,7 @@
         const traitKey = getTopTraitKey();
         const traitName = traitKey ? traitInfo[traitKey].name : '缘';
         const baseGrade = getChoiceGrade(choiceText);
+        const roleTag = currentBestMatch ? currentBestMatch.tag.replace('#', '') : '未定之身';
 
         const traitBoost = {
             X: ['帮', '救', '喝止', '告发', '烧掉'],
@@ -1891,29 +2245,154 @@
             '中签': ['风起萍末', '静观其变', '半明半晦'],
             '下签': ['暗潮伏波', '一步成劫', '灯影迷途']
         };
-        const seed = (book.id + scenario.text + choiceText + role).split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+        const seed = (book.id + scenario.text + choiceText + role)
+            .split('')
+            .reduce((sum, ch, i) => sum + ch.charCodeAt(0) * (i + 3), 0);
         const title = titleMap[grade][seed % titleMap[grade].length];
 
-        const gradeTone = {
-            '上签': '此举有锋有义，虽入险地，反能借势开路。',
-            '中签': '此举不失分寸，却仍有雾色横在前路。',
-            '下签': '此举避过一时风浪，却把暗线留在身后。'
-        };
         const bookTone = {
-            sjxx: '大漠风沙最验人心，桃花岛外也藏着因果。',
-            tldl: '少室山钟声未歇，大理月色照见一念善恶。',
-            xlwq: '江湖笑声越响，门派恩怨越难一剑斩断。',
-            yjlc: '光明顶暗道深长，屠龙刀影照出取舍。',
-            ldhc: '扬州烟火与紫禁城墙之间，最怕聪明误了本心。'
+            sjxx: [
+                '大漠风沙一起，真假恩仇最难遮掩。',
+                '桃花岛外潮声未退，越是看似偶然，越像命里伏笔。',
+                '弯弓与长风之间，此局先问胆识，再问心性。'
+            ],
+            tldl: [
+                '少室山钟声沉沉，一念慈悲也可能牵出百重因果。',
+                '大理月色照人，越温柔的局，越藏着难断的债。',
+                '群雄未至，暗线已动，此刻最验你如何安放善意。'
+            ],
+            xlwq: [
+                '琴声未落，剑影已起，笑傲之局从不只看胜负。',
+                '华山云气翻涌，门派规矩与个人本心正在相冲。',
+                '江湖越喧闹，越要听清自己那一点不肯低头的声音。'
+            ],
+            yjlc: [
+                '光明顶暗道深长，令牌与血迹都不是无端出现。',
+                '屠龙刀影一现，人心便各自露出锋芒。',
+                '元末风急，明暗两条路都在催你表态。'
+            ],
+            ldhc: [
+                '扬州烟火连着紫禁城墙，聪明人最容易被聪明困住。',
+                '骰子尚未落定，局中人已各自盘算退路。',
+                '鹿鼎江湖不怕滑头，只怕把真心也算成筹码。'
+            ]
         };
+
+        const roleTone = currentBestMatch ? [
+            `你带着「${role}」的${roleTag}入局，第一反应已经露出你的江湖底色。`,
+            `若以「${role}」来看，你这一步不是单纯选择，而是在替自己的「${traitName}」字落子。`,
+            `此局照见的不是运气，而是你身上近似「${role}」的那股执念与分寸。`
+        ] : [
+            '你尚未定下江湖原型，此签先按普通侠客的心性推演。',
+            '未测原型时，命签少一重底色，但你的选择仍有迹可循。',
+            '身份未明，行动却已先说话；江湖往往先记住这一笔。'
+        ];
+
+        const choiceTone = {
+            '上签': [
+                `你选「${choiceText}」，不是逞强，而是在混乱里先护住了该护的东西。`,
+                `「${choiceText}」这一选有主动入局之意，风险不小，却能把局面从暗处逼到明处。`,
+                `你以「${choiceText}」回应，没有把难题推给命数，反而伸手改了一寸风向。`
+            ],
+            '中签': [
+                `你选「${choiceText}」，胜在留有余地，也败在还未真正落子。`,
+                `「${choiceText}」这一手像隔帘观火，能避开莽撞，却也容易错过最好的时机。`,
+                `你以「${choiceText}」回应，没有被局势牵着走，但心里那一点犹疑仍会拖慢脚步。`
+            ],
+            '下签': [
+                `你选「${choiceText}」，一时看似自保，暗处却多添一根未断的线。`,
+                `「${choiceText}」这一手把风浪让过去了，却也把主动权交给了别人。`,
+                `你以「${choiceText}」避开了眼前的刀光，但江湖账本不会因此少记一笔。`
+            ]
+        };
+
+        const traitTone = {
+            X: [
+                '侠气可贵，但真正的侠不是每次都冲在最前，而是知道自己为何拔剑。',
+                '你的善意若有边界，就会成为力量；若全无边界，也会变成消耗。'
+            ],
+            M: [
+                '谋略在此局是灯，不是网；照亮形势即可，别把自己也困进去。',
+                '你看得见人心转折，这很好，但别让推演代替真正的判断。'
+            ],
+            Z: [
+                '执念让你不易退，但此刻最要紧的是确认自己守的方向没有偏。',
+                '能坚持是福，肯校准方向才是真本事。'
+            ],
+            Q: [
+                '情重之人最容易替别人多走一步，此签提醒你也要给自己留路。',
+                '你不是输在心软，而是要学会把心软给值得的人。'
+            ],
+            K: [
+                '狂气若有准星，便是破局之刃；若只求痛快，便会反伤自身。',
+                '你敢逆势而行，但越是敢，越要知道哪一步不可乱踏。'
+            ],
+            Y: [
+                '隐逸不是逃，真正的退后应当换来更清醒的观察。',
+                '你有抽身的本能，此刻可用来避险，也可用来蓄势。'
+            ],
+            null: [
+                '此签重在看清眼前局势，先不急着证明自己。',
+                '路未定时，少一点贪快，多一点分辨。'
+            ]
+        };
+
+        const endingTone = {
+            '上签': [
+                '若接下来顺势而行，此局反能成为你的开门之机。',
+                '今日不必求稳到底，见到该出手处，便可向前一步。'
+            ],
+            '中签': [
+                '此局尚未定胜负，关键在下一步是否问清来路。',
+                '先稳住心神，再看谁在局外拨弦。'
+            ],
+            '下签': [
+                '此签不凶在结果，凶在你可能低估了后患。',
+                '暂退可以，但别把沉默误作万全。'
+            ]
+        };
+
+        const yiMap = {
+            X: ['出手相助', '守住底线', '替人解围'],
+            M: ['问清来路', '暗中观察', '复盘局势'],
+            Z: ['定一件事', '守住承诺', '校准方向'],
+            Q: ['坦白心意', '照顾自己', '少替人扛'],
+            K: ['果断表态', '破旧规矩', '向前一步'],
+            Y: ['静观半日', '独处片刻', '缓一口气'],
+            null: ['少说多看', '问清来路', '稳住心神']
+        };
+
+        const jiMap = {
+            '上签': ['错失良机', '过度犹疑', '临阵退缩'],
+            '中签': ['急下断语', '轻信传闻', '两边讨好'],
+            '下签': ['贪近利', '装作无事', '心存侥幸']
+        };
+
+        const tipMap = {
+            X: `${role}之命，贵在侠心有界。`,
+            M: `${role}之命，贵在看破不说破。`,
+            Z: `${role}之命，贵在执而不僵。`,
+            Q: `${role}之命，贵在深情不自伤。`,
+            K: `${role}之命，贵在锋芒有准。`,
+            Y: `${role}之命，贵在退中见明。`,
+            null: '先测原型，可得专属命签。'
+        };
+
+        const body = [
+            seededPick(bookTone[book.id], seed, 1),
+            seededPick(roleTone, seed, 3),
+            seededPick(choiceTone[grade], seed, 5),
+            seededPick(traitTone[traitKey], seed, 7),
+            seededPick(endingTone[grade], seed, 9)
+        ].join('');
 
         return {
             grade,
             title,
-            body: `${bookTone[book.id]}你以「${role}」之心作此选择，${gradeTone[grade]}此签重在一个「${traitName}」字：能进时进，能退时退，莫让一念贪惧盖过本来的清明。`,
-            yi: grade === '下签' ? '少说多看' : (grade === '中签' ? '问清来路' : '顺势行动'),
-            ji: grade === '下签' ? '贪近利' : (grade === '中签' ? '急下断语' : '错失良机'),
-            tip: currentBestMatch ? `${role}之命，贵在守住本心。` : '先测原型，可得专属命签。'
+            body,
+            yi: seededPick(yiMap[traitKey], seed, 11),
+            ji: seededPick(jiMap[grade], seed, 13),
+            tip: currentBestMatch ? tipMap[traitKey] : tipMap[null]
         };
     }
 
